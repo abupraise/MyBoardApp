@@ -2,7 +2,11 @@ package com.SQD20.SQD20.LIVEPROJECT.domain.entites;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
 
 @Builder
@@ -12,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_tbl")
-public class AppUser extends BaseClass{
+public class AppUser extends BaseClass implements UserDetails {
 
     private String firstName;
     private String lastName;
@@ -22,4 +26,34 @@ public class AppUser extends BaseClass{
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskList> taskList;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("USER"));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }
