@@ -21,8 +21,5 @@ public class AppUser extends BaseClass{
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Task> tasks;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskList> taskList;
 }
