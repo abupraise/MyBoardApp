@@ -1,15 +1,12 @@
 package com.SQD20.SQD20.LIVEPROJECT.domain.entites;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "task_tbl")
+@Table(name = "taskList_tbl")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,9 +15,11 @@ import java.util.List;
 public class TaskList extends BaseClass{
     private String title;
     private String description;
-    @ManyToOne()
-    AppUser user;
-    @OneToMany()
-    List<Task> tasks;
+
+    @ManyToOne
+    private AppUser user;
+
+    @OneToMany(mappedBy = "taskList", cascade = CascadeType.ALL)
+    private List<Task> tasks;
 
 }

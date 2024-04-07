@@ -28,6 +28,9 @@ public class Task extends BaseClass{
     private Status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "taskId")
+    @JoinColumn(name = "user_Id")
+    private AppUser user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private TaskList taskList;
 }

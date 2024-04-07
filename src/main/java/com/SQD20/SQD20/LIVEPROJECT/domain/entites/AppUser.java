@@ -20,6 +20,6 @@ public class AppUser extends BaseClass{
     private String phoneNumber;
     private String password;
 
-    @OneToMany(mappedBy = "user_tbl", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskList> taskList;
 }
