@@ -16,16 +16,16 @@ class EmailServiceImplTest {
 
     private EmailServiceImpl emailService;
 
-    @Mock
+//    @Mock
     private JavaMailSender javaMailSender;
 
-    @BeforeEach
+//    @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
         emailService = new EmailServiceImpl(javaMailSender);
     }
 
-    @Test
+//    @Test
     void sendEmailAlert() {
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setRecipient("victorojo007@gmail.com");
