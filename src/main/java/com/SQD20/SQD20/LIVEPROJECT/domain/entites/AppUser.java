@@ -23,6 +23,7 @@ public class AppUser extends BaseClass implements UserDetails {
     private String email;
     private String phoneNumber;
     private String password;
+    private Boolean isEnabled;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskList> taskList;
@@ -54,6 +55,6 @@ public class AppUser extends BaseClass implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }

@@ -4,10 +4,12 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SecurityException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
@@ -15,15 +17,19 @@ import java.util.HashSet;
 import java.util.Set;
 @Service
 public class JwtService {
-    private final static String SECRET_KEY = "MYhN64Y6oFvxSBgwADMbOPc6PfykNZb6jPNGA6F/cFSUqcX7GZIWB2eDasx3jl4h9wg8FGkouP6FlTEiEhVcxw==";
+    @Value("${app.jwt-secret}")
+    private String SECRET_KEY;
+
+    @Value("${app.jwt-expiration}")
+    private Long jwtExpirationDate;
 
     public String generateToken(UserDetails user){
         return Jwts.builder()
-                .setSubject(user.getUsername())
+                .subject(user.getUsername())
                 .claim("authorities", populateAuthorities(user.getAuthorities()))
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationDate))
+                .signWith(getSigningKey())
                 .compact();
     }
 

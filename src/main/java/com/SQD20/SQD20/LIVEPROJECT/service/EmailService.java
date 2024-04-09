@@ -8,4 +8,6 @@ public interface EmailService {
 
     void sendEmailWithAttachment(EmailDetails emailDetails);
 
+    public void sendSimpleMailMessage(String name, String to, String token);
+
 }

@@ -59,6 +59,7 @@ public class EmailServiceImpl implements EmailService {
             mimeMessageHelper.setTo(emailDetails.getRecipient());
             mimeMessageHelper.setSubject(emailDetails.getSubject());
             mimeMessageHelper.setText(emailDetails.getMessageBody());
+            mimeMessageHelper.setText(emailDetails.getToken());
 
             FileSystemResource file = new FileSystemResource(new File(emailDetails.getAttachment()));
             mimeMessageHelper.addAttachment(Objects.requireNonNull(file.getFilename()), file);
@@ -69,6 +70,11 @@ public class EmailServiceImpl implements EmailService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    @Override
+    public void sendSimpleMailMessage(String name, String to, String token) {
 
     }
 }

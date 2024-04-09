@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
@@ -28,7 +30,7 @@ class EmailServiceImplTest {
    @Test
     void sendEmailAlert() {
         EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setRecipient("victorojo007@gmail.com");
+        emailDetails.setRecipient("gbajeeva@yahoo.com");
         emailDetails.setSubject("Test");
         emailDetails.setMessageBody("This is a test");
         assertDoesNotThrow(() -> emailService.sendEmailAlert(emailDetails));
@@ -38,7 +40,7 @@ class EmailServiceImplTest {
         verify(javaMailSender).send(argumentCaptor.capture());
         SimpleMailMessage sentMessage = argumentCaptor.getValue();
         //assertEquals("sender@example.com", sentMessage.getFrom());
-        assertEquals("victorojo007@gmail.com", sentMessage.getTo()[0]);
+        assertEquals("gbajeeva@yahoo.com", Objects.requireNonNull(sentMessage.getTo())[0]);
         assertEquals("Test", sentMessage.getSubject());
         assertEquals("This is a test", sentMessage.getText());
 
