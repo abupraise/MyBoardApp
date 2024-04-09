@@ -23,6 +23,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+          node-version: '20'
 
       - name: Unit Testing
         run: mvn -B test --file pom.xml
@@ -42,7 +43,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          dockerfile: Dockerfile
           push: true
           tags: rossypotentials/my-board:latest
 
