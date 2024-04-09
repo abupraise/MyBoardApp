@@ -50,7 +50,7 @@ public class JwtService {
         Claims claims = Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
-                .parseEncryptedClaims(token)
+                .parseSignedClaims(token)
                 .getPayload();
 
         return claims.getSubject();
