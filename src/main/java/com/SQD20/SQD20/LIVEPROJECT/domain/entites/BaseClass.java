@@ -15,7 +15,6 @@ import java.util.Objects;
 @MappedSuperclass
 @EnableJpaAuditing
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class BaseClass {
