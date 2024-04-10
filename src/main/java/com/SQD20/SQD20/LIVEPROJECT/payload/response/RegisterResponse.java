@@ -13,7 +13,4 @@ import lombok.NoArgsConstructor;
 public class RegisterResponse {
     private String responseCode;
     private String responseMessage;
-    private String email;
-    @JsonProperty("access_token")
-    private String accessToken;
 }

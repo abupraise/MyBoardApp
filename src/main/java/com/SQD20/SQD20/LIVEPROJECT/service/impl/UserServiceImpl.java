@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
+//@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Value("${baseUrl}")
@@ -85,8 +85,6 @@ public class UserServiceImpl implements UserService {
         return RegisterResponse.builder()
                 .responseCode(UserUtils.ACCOUNT_CREATION_SUCCESS_CODE)
                 .responseMessage(UserUtils.ACCOUNT_CREATION_SUCCESS_MESSAGE)
-                .email(newUser.getEmail())
-                .accessToken(jwtToken)
                 .build();
     }
 
@@ -113,17 +111,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public String verifyEmail(String token) {
         String username = jwtService.getUserName(token);
-        log.info(username);
+//        log.info(username);
         if(username != null){
             Optional<AppUser> user = userRepository.findByEmail(username);
-            log.info(username);
+//            log.info(username);
             if(user.isPresent()){
                 if(user.get().isEnabled()){
                     return "User has been verified!";
                 } else {
                     user.get().setIsEnabled(true);
                     userRepository.save(user.get());
-                    log.info("Got to verification line");
+//                    log.info("Got to verification line");
                     return "Email Verified";
                 }
 
