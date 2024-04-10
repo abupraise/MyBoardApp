@@ -71,4 +71,9 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
+
+    @Override
+    public void sendSimpleMailMessage(String name, String to, String token) {
+
+    }
 }

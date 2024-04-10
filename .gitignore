@@ -15,8 +15,9 @@
 *.iws
 *.iml
 *.ipr
+/target
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
