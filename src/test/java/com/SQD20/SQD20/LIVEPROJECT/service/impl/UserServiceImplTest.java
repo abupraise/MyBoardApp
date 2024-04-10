@@ -77,7 +77,6 @@ class UserServiceImplTest {
         authenticationRequest.setPassword("password");
 
         AppUser user = new AppUser();
-        user.setId(1L);
         user.setEmail("john.doe@example.com");
 
         when(userRepository.findByEmail("john.doe@example.com")).thenReturn(Optional.of(user));
