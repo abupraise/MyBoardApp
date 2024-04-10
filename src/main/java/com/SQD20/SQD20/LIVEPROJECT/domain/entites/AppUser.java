@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.domain.entites;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,6 +21,7 @@ public class AppUser extends BaseClass implements UserDetails {
 
     private String firstName;
     private String lastName;
+    @Email
     private String email;
     private String phoneNumber;
     private String password;
