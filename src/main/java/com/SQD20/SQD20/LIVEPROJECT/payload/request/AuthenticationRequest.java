@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class AuthenticationRequest {
     @NotBlank(message = "Email must not be empty")
     private String email;
-    @Size(min = 6, max = 16, message = "password must be at least 2 characters long")
+    @Size(min = 6, max = 16, message = "Password must be at least 2 characters long")
     @NotBlank(message = "Password must not be empty")
     private String password;
 }

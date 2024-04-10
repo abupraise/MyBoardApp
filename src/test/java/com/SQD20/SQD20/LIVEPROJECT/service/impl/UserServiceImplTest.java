@@ -62,9 +62,7 @@ class UserServiceImplTest {
         when(userRepository.existsByEmail("john.doe@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
         when(userRepository.save(any())).thenAnswer(invocation -> {
-            AppUser newUser = invocation.getArgument(0);
-            newUser.setId(1L); // Setting some dummy id
-            return newUser;
+            return invocation.<AppUser>getArgument(0);
         });
 
         RegisterResponse response = userService.register(registerRequest);
