@@ -17,7 +17,7 @@
 *.ipr
 /target
 
-# Package Files #
+# Package Files #g
 *.jar
 *.war
 *.nar
