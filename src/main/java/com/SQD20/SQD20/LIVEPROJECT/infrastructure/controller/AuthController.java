@@ -7,7 +7,13 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,8 +22,18 @@ public class AuthController {
     private final UserServiceImpl userService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(
-            @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<?> register(@Validated
+            @RequestBody RegisterRequest registerRequest, BindingResult bindingResult){
+
+        if (bindingResult.hasErrors()) {
+            // Construct error response with specific error messages for each field
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         RegisterResponse authenticationResponse = userService.register(registerRequest);
         return ResponseEntity.ok(authenticationResponse);
     }
