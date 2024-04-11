@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -52,8 +54,27 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
+        // Validate email format
+        String emailRegex = "^(.+)@(.+)$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher = pattern.matcher(registerRequest.getEmail());
+        if (!matcher.matches()) {
+            return RegisterResponse.builder()
+                    .responseCode(UserUtils.INVALID_EMAIL_FORMAT_CODE)
+                    .responseMessage(UserUtils.INVALID_EMAIL_FORMAT_MESSAGE)
+                    .build();
+        }
 
-        if(userRepository.existsByEmail(registerRequest.getEmail())){
+        // Validate email domain
+        String[] emailParts = registerRequest.getEmail().split("\\.");
+        if (emailParts.length < 2 || emailParts[emailParts.length - 1].length() < 2) {
+            return RegisterResponse.builder()
+                    .responseCode(UserUtils.INVALID_EMAIL_DOMAIN_CODE)
+                    .responseMessage(UserUtils.INVALID_EMAIL_DOMAIN_MESSAGE)
+                    .build();
+        }
+
+        if (userRepository.existsByEmail(registerRequest.getEmail())){
             return RegisterResponse.builder()
                     .responseCode(UserUtils.ACCOUNT_EXISTS_CODE)
                     .responseMessage(UserUtils.ACCOUNT_EXISTS_MESSAGE)
@@ -87,6 +108,7 @@ public class UserServiceImpl implements UserService {
                 .responseMessage(UserUtils.ACCOUNT_CREATION_SUCCESS_MESSAGE)
                 .build();
     }
+
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {

@@ -13,4 +13,9 @@ public class UserUtils {
 
     public final static String INVALID_REQUEST_CODE = "004";
     public final static String INVALID_REQUEST_MESSAGE = "Fields must be filled";
+    public final static String INVALID_EMAIL_FORMAT_CODE = "005";
+    public final static String INVALID_EMAIL_FORMAT_MESSAGE = "Invalid email format";
+
+    public final static String INVALID_EMAIL_DOMAIN_CODE = "006";
+    public final static String INVALID_EMAIL_DOMAIN_MESSAGE = "Invalid email domain";
 }
