@@ -13,6 +13,7 @@ import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.EmailTemplate;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,19 +41,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
 
     @Override
-    public RegisterResponse register(RegisterRequest registerRequest) {
-
-        // Check if any required field is null or empty
-        if (registerRequest.getFirstName() == null || registerRequest.getFirstName().isEmpty() ||
-                registerRequest.getLastName() == null || registerRequest.getLastName().isEmpty() ||
-                registerRequest.getEmail() == null || registerRequest.getEmail().isEmpty() ||
-                registerRequest.getPhoneNumber() == null || registerRequest.getPhoneNumber().isEmpty() ||
-                registerRequest.getPassword() == null || registerRequest.getPassword().isEmpty()) {
-            return RegisterResponse.builder()
-                    .responseCode(UserUtils.INVALID_REQUEST_CODE)
-                    .responseMessage(UserUtils.INVALID_REQUEST_MESSAGE)
-                    .build();
-        }
+    public RegisterResponse register(@Valid RegisterRequest registerRequest) {
 
         // Validate email format
         String emailRegex = "^(.+)@(.+)$";
