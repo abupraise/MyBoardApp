@@ -20,7 +20,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/verify-email").permitAll()
-                        .requestMatchers("/api/v1/task/update/**").permitAll()
                         .anyRequest()
                         .authenticated()
                 )
