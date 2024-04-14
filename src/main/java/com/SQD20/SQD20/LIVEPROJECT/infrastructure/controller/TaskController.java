@@ -20,7 +20,7 @@ public class TaskController  {
     public ResponseEntity<String> deleteTask(@PathVariable Long id){
         taskService.deleteTask(id);
 
-        return new ResponseEntity<>("Task Deleted Successfully!", HttpStatus.OK);
+        return new ResponseEntity<>("Task Deleted Successfully!", HttpStatus.NO_CONTENT);
     }
 
 }
