@@ -37,11 +37,7 @@ public class TaskListServiceImpl implements TaskListService {
             taskList.setDescription(taskListRequest.getDescription()); // Update the description field of the fetched TaskList entity
         }
 
-        TaskList taskListObj = new TaskList();
-        taskListObj.setTitle(taskList.getTitle());
-        taskListObj.setDescription(taskList.getDescription());
-
-        return taskListObj; // Save the updated TaskList entity
+        return taskListRepository.save(taskList); // Save the updated TaskList entity
     }
 
 }
