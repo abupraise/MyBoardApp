@@ -47,4 +47,10 @@ public class AuthController {
     public ResponseEntity<String> verifyEmail(@RequestParam(name = "token") String token ){
         return ResponseEntity.ok(userService.verifyEmail(token));
     }
+
+    @PostMapping("/users/resend-email")
+    public ResponseEntity<?> resendEmailVerification(@RequestParam(name = "email") String email) {
+        ResponseEntity<?> response = userService.resendEmailVerification(email);
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
 }
