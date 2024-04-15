@@ -80,7 +80,7 @@ public class TaskServiceImplTest {
 
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
-        taskService.deleteById(taskId);
+        taskService.deleteTask(taskId);
 
         verify(taskRepository).delete(task);
     }
@@ -91,7 +91,7 @@ public class TaskServiceImplTest {
         Long invalidId = 100L;
         when(taskRepository.findById(invalidId)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class, () -> taskService.deleteById(invalidId));
+        assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(invalidId));
     }
 
     @Test
@@ -100,6 +100,6 @@ public class TaskServiceImplTest {
         Long taskId = 1L;
         when(taskRepository.findById(taskId)).thenThrow(new TaskNotFoundException("Testing that the right exception is thrown"));
 
-        assertThrows(TaskNotFoundException.class, () -> taskService.deleteById(taskId));
+        assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(taskId));
     }
 }
