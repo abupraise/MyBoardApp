@@ -18,7 +18,4 @@ public class UserUtils {
 
     public final static String INVALID_EMAIL_DOMAIN_CODE = "006";
     public final static String INVALID_EMAIL_DOMAIN_MESSAGE = "Invalid email domain";
-
-    public final static String TASKLIST_SUCCESS_CODE= "007";
-    public final static String TASKLIST_SUCCESS_MESSAGE = "TASK LIST CHANGED SUCCESSFULLY";
 }
