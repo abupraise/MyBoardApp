@@ -1,12 +1,16 @@
 package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.domain.enums.PriorityLevel;
 import com.SQD20.SQD20.LIVEPROJECT.domain.enums.Status;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
+import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 
+import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +28,12 @@ public class TaskServiceImplTest {
 
     @Mock
     private TaskRepository taskRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private TaskListRepository taskListRepository;
 
     @InjectMocks
     private TaskServiceImpl taskService;
@@ -101,5 +111,28 @@ public class TaskServiceImplTest {
         when(taskRepository.findById(taskId)).thenThrow(new TaskNotFoundException("Testing that the right exception is thrown"));
 
         assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(taskId));
+    }
+
+    @Test
+    public void testCreateTask() {
+
+        Long userId = 1L;
+        Long taskListId = 1L;
+        AppUser user = new AppUser();
+        TaskList taskList = new TaskList();
+
+        TaskRequest createRequest = new TaskRequest();
+        createRequest.setTitle("Task Title");
+        createRequest.setDescription("Task Description");
+        createRequest.setDeadline(LocalDateTime.now());
+        createRequest.setPriorityLevel(PriorityLevel.HIGH);
+        createRequest.setStatus(Status.IN_PROGRESS);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(taskListRepository.findById(taskListId)).thenReturn(Optional.of(taskList));
+
+        taskService.createTask(userId, taskListId, createRequest);
+
+        verify(taskRepository, times(1)).save(any(Task.class));
     }
 }

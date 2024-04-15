@@ -31,4 +31,9 @@ public class TaskController  {
         return new ResponseEntity<>("Task Deleted Successfully!", HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/new_task/{userId}/{taskListId}")
+    public ResponseEntity<String> createTask(@PathVariable Long userId, @PathVariable Long taskListId, @RequestBody TaskRequest createRequest) {
+        taskService.createTask(userId, taskListId, createRequest);
+        return ResponseEntity.ok("Task created successfully");
+    }
 }

@@ -1,8 +1,14 @@
 package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskNotFoundException;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
+import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
+import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
@@ -14,6 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
+
+    private final UserRepository userRepository;
+
+    private final TaskListRepository taskListRepository;
 
     @Transactional
     @Override
@@ -36,6 +46,24 @@ public class TaskServiceImpl implements TaskService {
                 () -> new TaskNotFoundException("Task Not Found"));
 
         taskRepository.delete(task);
+    }
+
+    @Override
+    public void createTask(Long userId, Long taskListId, TaskRequest createRequest) {
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+        TaskList taskList = taskListRepository.findById(taskListId)
+                .orElseThrow(() -> new TaskListNotFoundException("Task List not found with id: " + taskListId));
+        Task task = new Task();
+        task.setTitle(createRequest.getTitle());
+        task.setDescription(createRequest.getDescription());
+        task.setDeadline(createRequest.getDeadline());
+        task.setPriorityLevel(createRequest.getPriorityLevel());
+        task.setStatus(createRequest.getStatus());
+        task.setUser(user);
+        task.setTaskList(taskList);
+        taskRepository.save(task);
+
     }
 }
 
