@@ -17,6 +17,5 @@ import java.util.List;
 public class TaskListRequest {
     private String title;
     private String description;
-    private AppUser user;
-    private List<Task> tasks;
+
 }
