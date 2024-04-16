@@ -8,5 +8,5 @@ public interface TaskService {
 
     public void deleteTask(Long id);
     public void updateTask(Long taskId, TaskRequest updateRequest);
-    public void createTask(Long userId, Long taskListId, TaskRequest createRequest);
+    public TaskRequest createTask(Long userId, Long taskListId, TaskRequest createRequest);
 }

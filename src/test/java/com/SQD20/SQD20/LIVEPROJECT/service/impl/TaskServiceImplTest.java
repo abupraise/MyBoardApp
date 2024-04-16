@@ -5,7 +5,9 @@ import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.domain.enums.PriorityLevel;
 import com.SQD20.SQD20.LIVEPROJECT.domain.enums.Status;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskNotFoundException;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
@@ -114,25 +116,81 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testCreateTask() {
-
+    void testCreateTaskSuccess() {
+        // Arrange
         Long userId = 1L;
-        Long taskListId = 1L;
+        Long taskListId = 2L;
+        TaskRequest request = new TaskRequest();
+        request.setTitle("Test Task");
+        request.setDescription("Test Description");
+        request.setDeadline(null);
+        request.setPriorityLevel(PriorityLevel.HIGH);
+        request.setStatus(Status.PENDING);
+
         AppUser user = new AppUser();
         TaskList taskList = new TaskList();
 
-        TaskRequest createRequest = new TaskRequest();
-        createRequest.setTitle("Task Title");
-        createRequest.setDescription("Task Description");
-        createRequest.setDeadline(LocalDateTime.now());
-        createRequest.setPriorityLevel(PriorityLevel.HIGH);
-        createRequest.setStatus(Status.IN_PROGRESS);
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+        when(taskListRepository.findById(taskListId)).thenReturn(java.util.Optional.of(taskList));
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
+            Task savedTask = invocation.getArgument(0);
+
+            request.setTitle(savedTask.getTitle());
+            request.setDescription(savedTask.getDescription());
+            request.setDeadline(savedTask.getDeadline());
+            request.setPriorityLevel(savedTask.getPriorityLevel());
+            request.setStatus(savedTask.getStatus());
+            return savedTask;
+        });
+
+        // Act
+        TaskRequest createdTaskRequest = taskService.createTask(userId, taskListId, request);
+
+        // Assert
+        assertNotNull(createdTaskRequest);
+        assertEquals(request.getTitle(), createdTaskRequest.getTitle());
+        assertEquals(request.getDescription(), createdTaskRequest.getDescription());
+        assertEquals(request.getPriorityLevel(), createdTaskRequest.getPriorityLevel());
+        assertEquals(request.getStatus(), createdTaskRequest.getStatus());
+
+        verify(userRepository).findById(userId);
+        verify(taskListRepository).findById(taskListId);
+        verify(taskRepository).save(any(Task.class));
+    }
+
+    @Test
+    void testCreateTaskUserNotFound() {
+        // Arrange
+        Long userId = 1L;
+        Long taskListId = 2L;
+        TaskRequest request = new TaskRequest();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(UsernameNotFoundException.class, () -> taskService.createTask(userId, taskListId, request));
+        verify(userRepository).findById(userId);
+        verifyNoInteractions(taskListRepository);
+        verifyNoInteractions(taskRepository);
+    }
+
+    @Test
+    void testCreateTaskListNotFound() {
+        // Arrange
+        Long userId = 1L;
+        Long taskListId = 2L;
+        TaskRequest request = new TaskRequest();
+        AppUser user = new AppUser();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(taskListRepository.findById(taskListId)).thenReturn(Optional.of(taskList));
+        when(taskListRepository.findById(taskListId)).thenReturn(Optional.empty());
+        when(taskListRepository.findById(1L)).thenReturn(Optional.empty());
 
-        taskService.createTask(userId, taskListId, createRequest);
-
-        verify(taskRepository, times(1)).save(any(Task.class));
+        // Act & Assert
+        assertThrows(TaskListNotFoundException.class, () -> taskService.createTask(userId, taskListId, request));
+        verify(userRepository).findById(userId);
+        verify(taskListRepository).findById(taskListId);
+        verify(taskListRepository).findById(1L);
+        verifyNoInteractions(taskRepository);
     }
 }

@@ -49,7 +49,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void createTask(Long userId, Long taskListId, TaskRequest createRequest) {
+    public TaskRequest createTask(Long userId, Long taskListId, TaskRequest createRequest) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User with " + userId + " not found"));
 
@@ -57,7 +57,6 @@ public class TaskServiceImpl implements TaskService {
         if (taskList == null) {
             taskList = taskListRepository.findById(1L)
                     .orElseThrow(() -> new TaskListNotFoundException("No task list found"));
-
         }
 
             Task task = new Task();
@@ -69,6 +68,7 @@ public class TaskServiceImpl implements TaskService {
             task.setUser(user);
             task.setTaskList(taskList);
             taskRepository.save(task);
+            return createRequest;
     }
 }
 
