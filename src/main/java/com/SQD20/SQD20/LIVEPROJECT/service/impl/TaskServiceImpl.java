@@ -52,18 +52,23 @@ public class TaskServiceImpl implements TaskService {
     public void createTask(Long userId, Long taskListId, TaskRequest createRequest) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User with " + userId + " not found"));
-        TaskList taskList = taskListRepository.findById(taskListId)
-                .orElseThrow(() -> new TaskListNotFoundException("Task List not found with id: " + taskListId));
-        Task task = new Task();
-        task.setTitle(createRequest.getTitle());
-        task.setDescription(createRequest.getDescription());
-        task.setDeadline(createRequest.getDeadline());
-        task.setPriorityLevel(createRequest.getPriorityLevel());
-        task.setStatus(createRequest.getStatus());
-        task.setUser(user);
-        task.setTaskList(taskList);
-        taskRepository.save(task);
 
+        TaskList taskList = taskListRepository.findById(taskListId).orElse(null);
+        if (taskList == null) {
+            taskList = taskListRepository.findById(1L)
+                    .orElseThrow(() -> new TaskListNotFoundException("No task list found"));
+
+        }
+
+            Task task = new Task();
+            task.setTitle(createRequest.getTitle());
+            task.setDescription(createRequest.getDescription());
+            task.setDeadline(createRequest.getDeadline());
+            task.setPriorityLevel(createRequest.getPriorityLevel());
+            task.setStatus(createRequest.getStatus());
+            task.setUser(user);
+            task.setTaskList(taskList);
+            taskRepository.save(task);
     }
 }
 

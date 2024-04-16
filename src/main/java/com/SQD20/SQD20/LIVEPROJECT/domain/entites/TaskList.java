@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class TaskList extends BaseClass{
+
     private String title;
     private String description;
 
