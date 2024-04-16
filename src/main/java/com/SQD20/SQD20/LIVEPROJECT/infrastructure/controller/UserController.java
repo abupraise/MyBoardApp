@@ -19,9 +19,9 @@ public class UserController {
         UserResponse updatedUser = userService.editUser(id, registerRequest);
         return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
     }
-    @GetMapping("/view-user/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserResponse> viewUser (@PathVariable Long id){
-        UserResponse appUser = userService.getUserById(id);
+        UserResponse appUser = userService.viewUser(id);
         return new ResponseEntity<> (appUser, HttpStatus.OK);
     }
 

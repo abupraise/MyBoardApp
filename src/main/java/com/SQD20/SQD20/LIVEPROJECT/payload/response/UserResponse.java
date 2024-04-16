@@ -16,6 +16,5 @@ public class UserResponse {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private List<TaskList> taskList;
 }
 

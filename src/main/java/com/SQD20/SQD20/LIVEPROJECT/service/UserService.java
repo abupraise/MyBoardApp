@@ -15,6 +15,6 @@ public interface UserService {
     public String verifyEmail(String token);
     public ResponseEntity<?> resendEmailVerification(String email);
     UserResponse editUser(Long id, RegisterRequest registerRequest);
-    UserResponse getUserById(Long id);
+    UserResponse viewUser(Long id);
 
 }

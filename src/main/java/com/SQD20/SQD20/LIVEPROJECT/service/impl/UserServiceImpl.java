@@ -199,7 +199,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse getUserById(Long id) {
+    public UserResponse viewUser(Long id) {
         AppUser viewUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -209,7 +209,6 @@ public class UserServiceImpl implements UserService {
                 .lastName(viewUser.getLastName())
                 .phoneNumber(viewUser.getPhoneNumber())
                 .email(viewUser.getEmail())
-                .taskList(viewUser.getTaskList())
                 .build();
     }
 
