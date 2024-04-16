@@ -45,4 +45,16 @@ public class GlobalExceptionHandler {
                 .build();
         return  ResponseEntity.ok(errorDetails);
     }
+
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorDetails>userNotFoundHandler(final UserNotFoundException ex){
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .message(ex.getMessage())
+                .debugMessage("User Not Found")
+                .dateTime(LocalDateTime.now())
+                .status(HttpStatus.NOT_FOUND)
+                .build();
+        return  ResponseEntity.ok(errorDetails);
+    }
 }

@@ -4,6 +4,7 @@ import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskListService;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.TaskListServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,13 @@ public class TaskListController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+    }
+
+
+    @PostMapping("/create-task-list/{id}")
+    public ResponseEntity<TaskResponse> createTaskList(@PathVariable Long id, @RequestBody TaskListRequest request){
+        TaskResponse createdList = taskListService.createTaskList(id, request);
+        return  new ResponseEntity<>(createdList,HttpStatus.CREATED);
     }
 
 
