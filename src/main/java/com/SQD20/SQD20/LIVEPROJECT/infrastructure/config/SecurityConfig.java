@@ -21,6 +21,19 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/verify-email").permitAll()
                         .requestMatchers("/api/v1/auth/users/resend-email").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/webjars/**",
+                                "/swagger-ui/**",
+                                "configuration/security",
+                                "configuration/ui",
+                                "/swagger-resources/**",
+                                "/swagger-resources",
+                                "/v2/api-docs",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**"
+
+                        ).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
