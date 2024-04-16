@@ -18,4 +18,7 @@ public class UserUtils {
 
     public final static String INVALID_EMAIL_DOMAIN_CODE = "006";
     public final static String INVALID_EMAIL_DOMAIN_MESSAGE = "Invalid email domain";
+    public static String USER_UPDATE_MESSAGE = "This user have been Updated Successfully!";
+    public static String USER_DETAILS_MESSAGE = "USER DETAILS";
+
 }

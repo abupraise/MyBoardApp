@@ -2,10 +2,12 @@ package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -217,4 +220,73 @@ class UserServiceImplTest {
         assert(responseEntity.getStatusCodeValue() == HttpStatus.BAD_REQUEST.value());
         assert(responseEntity.getBody().equals("User's email is already verified."));
     }
+    @Test
+    void testEditUser() {
+        // Mocking data
+        Long userId = 1L;
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setFirstName("John");
+        registerRequest.setLastName("Grace");
+        registerRequest.setPhoneNumber("09051527654");
+
+        AppUser existingUser = new AppUser();
+
+
+        // Mocking repository behavior
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Testing editUser method
+        UserResponse editedUser = userService.editUser(userId, registerRequest);
+
+        // Assertions
+        verify(userRepository).findById(userId);
+        verify(userRepository).save(existingUser);
+        verifyNoMoreInteractions(userRepository);
+        // Add more assertions as needed
+    }
+
+    @Test
+    void testGetUserById() {
+        // Mocking data
+        Long userId = 1L;
+
+        AppUser existingUser = new AppUser();
+        existingUser.setFirstName("Praise");
+        existingUser.setLastName("JohnPual");
+        existingUser.setPhoneNumber("08140996323");
+
+        // Mocking repository behavior
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+
+        // Testing getUserById method
+        UserResponse userResponse = userService.viewUser(userId);
+
+        // Assertions
+        verify(userRepository).findById(userId);
+        // Add assertions to check userResponse fields against existingUser fields
+        // Add more assertions as needed
+    }
+
+    @Test
+    void testGetUserById_UserNotFound() {
+        // Mocking data
+        Long userId = 1L;
+
+        // Mocking repository behavior
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Testing getUserById method for user not found scenario
+        try {
+            userService.viewUser(userId);
+            fail("Expected UsernameNotFoundException was not thrown");
+        } catch (UsernameNotFoundException e) {
+            // UsernameNotFoundException thrown as expected
+        }
+
+        // Assertions
+        verify(userRepository).findById(userId);
+        // Add more assertions as needed
+    }
+
 }
