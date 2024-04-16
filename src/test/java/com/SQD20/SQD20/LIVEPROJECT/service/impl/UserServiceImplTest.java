@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -168,5 +170,51 @@ class UserServiceImplTest {
         assertEquals("Invalid token or broken link", result);
         verify(userRepository, never()).findByEmail(any());
         verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    public void testResendEmailVerification_Success() {
+        String email = "test@example.com";
+        String token = "your_generated_token";
+
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        user.setIsEnabled(false); // Assuming the user is not enabled initially
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(user)).thenReturn(token);
+
+        ResponseEntity<?> responseEntity = userService.resendEmailVerification(email);
+
+        assert(responseEntity.getStatusCodeValue() == HttpStatus.OK.value());
+        assert(responseEntity.getBody().equals("Verification email resent successfully."));
+    }
+
+    @Test
+    public void testResendEmailVerification_UserNotExist() {
+        String email = "nonexistent@example.com";
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        ResponseEntity<?> responseEntity = userService.resendEmailVerification(email);
+
+        assert(responseEntity.getStatusCodeValue() == HttpStatus.BAD_REQUEST.value());
+        assert(responseEntity.getBody().equals("User with the provided email does not exist."));
+    }
+
+    @Test
+    public void testResendEmailVerification_EmailAlreadyVerified() {
+        String email = "verified@example.com";
+
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        user.setIsEnabled(true); // Assuming the user's email is already verified
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        ResponseEntity<?> responseEntity = userService.resendEmailVerification(email);
+
+        assert(responseEntity.getStatusCodeValue() == HttpStatus.BAD_REQUEST.value());
+        assert(responseEntity.getBody().equals("User's email is already verified."));
     }
 }

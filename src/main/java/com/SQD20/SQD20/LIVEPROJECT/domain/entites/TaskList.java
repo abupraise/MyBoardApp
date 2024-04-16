@@ -15,10 +15,8 @@ import java.util.List;
 public class TaskList extends BaseClass{
     private String title;
     private String description;
-
     @ManyToOne
     private AppUser user;
-
     @OneToMany(mappedBy = "taskList", cascade = CascadeType.ALL)
     private List<Task> tasks;
 

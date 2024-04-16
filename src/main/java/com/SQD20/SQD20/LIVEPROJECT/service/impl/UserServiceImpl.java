@@ -17,11 +17,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +60,8 @@ public class UserServiceImpl implements UserService {
         // Validate email domain
         String[] emailParts = registerRequest.getEmail().split("\\.");
         if (emailParts.length < 2 || emailParts[emailParts.length - 1].length() < 2) {
+            System.out.println("Invalid email domain. Email parts: " + Arrays.toString(emailParts));
+
             return RegisterResponse.builder()
                     .responseCode(UserUtils.INVALID_EMAIL_DOMAIN_CODE)
                     .responseMessage(UserUtils.INVALID_EMAIL_DOMAIN_MESSAGE)
@@ -140,6 +145,40 @@ public class UserServiceImpl implements UserService {
                 return "User does not exist";
             }
         }
-         return "Invalid token or broken link";
+        return "Invalid token or broken link";
     }
+
+    @Override
+    public ResponseEntity<?> resendEmailVerification(String email) {
+        // Check if the user exists
+        Optional<AppUser> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.badRequest().body("User with the provided email does not exist.");
+        }
+        AppUser user = optionalUser.get();
+
+        // Check if the user's email is already verified
+        if (user.isEnabled()) {
+            return ResponseEntity.badRequest().body("User's email is already verified.");
+        }
+
+        // Generate a new verification token
+        String jwtToken = jwtService.generateToken(user);
+
+        // Send the verification email
+        EmailDetails emailDetails = EmailDetails.builder()
+                .recipient(user.getEmail())
+                .subject("ACCOUNT VERIFICATION")
+                .messageBody(EmailTemplate.getEmailMessage(user.getFirstName(), baseUrl, jwtToken))
+                .build();
+
+        try {
+            emailService.sendEmailAlert(emailDetails);
+            return ResponseEntity.ok().body("Verification email resent successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to resend verification email. Please try again later.");
+        }
+    }
+
 }
