@@ -8,6 +8,7 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.request.EmailDetails;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
@@ -180,5 +181,37 @@ public class UserServiceImpl implements UserService {
                     .body("Failed to resend verification email. Please try again later.");
         }
     }
+
+    @Override
+    public UserResponse editUser(Long id, RegisterRequest registerRequest) {
+        AppUser appUser = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("No User associated with " + id));
+        appUser.setFirstName(registerRequest.getFirstName());
+        appUser.setLastName(registerRequest.getLastName());
+        appUser.setPhoneNumber(registerRequest.getPhoneNumber());
+        userRepository.save(appUser);
+        return UserResponse.builder()
+                .responseMessage(UserUtils.USER_UPDATE_MESSAGE)
+                .firstName(appUser.getFirstName())
+                .lastName(appUser.getLastName())
+                .phoneNumber(appUser.getPhoneNumber())
+                .build();
+    }
+
+    @Override
+    public UserResponse getUserById(Long id) {
+        AppUser viewUser = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return UserResponse.builder()
+                .responseMessage(UserUtils.USER_DETAILS_MESSAGE)
+                .firstName(viewUser.getFirstName())
+                .lastName(viewUser.getLastName())
+                .phoneNumber(viewUser.getPhoneNumber())
+                .email(viewUser.getEmail())
+                .taskList(viewUser.getTaskList())
+                .build();
+    }
+
 
 }
