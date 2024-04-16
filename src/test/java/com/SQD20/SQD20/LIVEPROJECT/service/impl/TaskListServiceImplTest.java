@@ -1,9 +1,14 @@
 package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundException;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UserNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
+import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
+import com.SQD20.SQD20.LIVEPROJECT.utils.TaskListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,12 +17,13 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 class TaskListServiceImplTest {
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private TaskListRepository taskListRepository;
@@ -67,5 +73,43 @@ class TaskListServiceImplTest {
         assertThrows(TaskListNotFoundException.class, () -> taskListService.updateTaskListByUserId(taskListId, request));
         verify(taskListRepository, times(1)).findById(taskListId);
         verify(taskListRepository, never()).save(any());
+    }
+
+
+    @Test
+    void testCreateTaskList_Success() {
+        // Mocking data
+        Long userId = 1L;
+        TaskListRequest request = new TaskListRequest("Test Title", "Test Description");
+        AppUser user = new AppUser();
+        user.setId(userId);
+
+        // Mocking behavior
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
+
+        // Method call
+        TaskResponse response = taskListService.createTaskList(userId, request);
+
+        // Verifications
+        verify(userRepository, times(1)).findById(userId);
+        verify(taskListRepository, times(1)).save(any(TaskList.class));
+        assertNotNull(response);
+        assertEquals(TaskListUtils.TASK_LIST_CREATION_SUCCESS_CODE, response.getResponseCode());
+        assertEquals(TaskListUtils.TASK_LIST_CREATION_MESSAGE, response.getResponseMessage());
+    }
+
+    @Test
+    void testCreateTaskList_UserNotFound() {
+        // Mocking data
+        Long userId = 1L;
+        TaskListRequest request = new TaskListRequest("Test Title", "Test Description");
+
+        // Mocking behavior
+        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
+
+        // Method call and verification
+        assertThrows(UserNotFoundException.class, () -> taskListService.createTaskList(userId, request));
+        verify(userRepository, times(1)).findById(userId);
+        verify(taskListRepository, never()).save(any(TaskList.class));
     }
 }
