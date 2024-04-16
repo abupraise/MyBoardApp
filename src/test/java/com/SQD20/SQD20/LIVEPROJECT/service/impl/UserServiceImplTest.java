@@ -260,7 +260,7 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
 
         // Testing getUserById method
-        UserResponse userResponse = userService.getUserById(userId);
+        UserResponse userResponse = userService.viewUser(userId);
 
         // Assertions
         verify(userRepository).findById(userId);
@@ -278,7 +278,7 @@ class UserServiceImplTest {
 
         // Testing getUserById method for user not found scenario
         try {
-            userService.getUserById(userId);
+            userService.viewUser(userId);
             fail("Expected UsernameNotFoundException was not thrown");
         } catch (UsernameNotFoundException e) {
             // UsernameNotFoundException thrown as expected
