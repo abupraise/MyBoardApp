@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         ),
         externalDocs = @ExternalDocumentation(
                 description = "RESTful API Task Management System Documentation",
-                url = "https://github.com/decadev-sq020"
+                url = "https://github.com/egbas"
         ),
         security = {
                 @SecurityRequirement(
