@@ -119,29 +119,6 @@ class TaskListServiceImplTest {
         verify(taskListRepository, never()).save(any(TaskList.class));
     }
     @Test
-    void testDeleteTaskListByTitle() {
-        AppUser user = new AppUser();
-        user.setEmail("jane.doe@example.org");
-        user.setFirstName("Jane");
-        user.setIsEnabled(true);
-        user.setLastName("Doe");
-        user.setPassword("iloveyou");
-        user.setPhoneNumber("6625550144");
-        user.setTaskList(new ArrayList<>());
-
-        TaskList taskList = new TaskList();
-        taskList.setDescription("The characteristics of someone or something");
-        taskList.setTasks(new ArrayList<>());
-        taskList.setTitle("Dr");
-        taskList.setUser(user);
-        Optional<TaskList> ofResult = Optional.of(taskList);
-        doNothing().when(taskListRepository).delete(Mockito.any());
-        when(taskListRepository.findByTitle(Mockito.any())).thenReturn(ofResult);
-        doNothing().when(taskListRepository).deleteAll(Mockito.any());
-
-        assertThrows(TaskListNotFoundException.class, () -> taskListService.deleteTaskListByTitle("Dr"));
-    }
-    @Test
     void testDeleteTaskListById() {
 
         AppUser user = new AppUser();
@@ -163,6 +140,6 @@ class TaskListServiceImplTest {
         when(taskListRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
         doNothing().when(taskListRepository).deleteAll(Mockito.any());
 
-        assertThrows(TaskListNotFoundException.class, () -> taskListService.deleteTaskListById(1L));
+        assertNotNull(taskListService.deleteTaskListById(1L));
     }
 }

@@ -37,16 +37,14 @@ public class TaskListController {
         return  new ResponseEntity<>(createdList,HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/delete-by-title/{title}")
-    public ResponseEntity<String> deleteByTitle(@PathVariable String title){
-        taskListService.deleteTaskListByTitle(title);
-        return ResponseEntity.ok("Deleted successfully");
-    }
-
-    @DeleteMapping("/delete-by-title/{id}")
-    public ResponseEntity<String> deleteById(@PathVariable long id){
-        taskListService.deleteTaskListById(id);
-        return ResponseEntity.ok("Deleted successfully");
+    @DeleteMapping("/delete-task-list/{id}")
+    public ResponseEntity<TaskList> deleteById(@PathVariable long id){
+       TaskList deletedTaskList = taskListService.deleteTaskListById(id);
+        if(deletedTaskList != null){
+            return new ResponseEntity<>(deletedTaskList, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
 }
