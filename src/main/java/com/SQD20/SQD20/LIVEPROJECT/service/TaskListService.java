@@ -9,6 +9,6 @@ public interface TaskListService {
     public TaskList updateTaskListByUserId(Long taskListId, TaskListRequest taskListRequest);
     TaskResponse createTaskList(Long id, TaskListRequest request);
 
-     TaskList deleteTaskListById(long Id);
+     TaskList deleteTask(long Id);
 
 }

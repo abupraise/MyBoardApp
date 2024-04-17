@@ -140,6 +140,6 @@ class TaskListServiceImplTest {
         when(taskListRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
         doNothing().when(taskListRepository).deleteAll(Mockito.any());
 
-        assertNotNull(taskListService.deleteTaskListById(1L));
+        assertNotNull(taskListService.deleteTask(1L));
     }
 }

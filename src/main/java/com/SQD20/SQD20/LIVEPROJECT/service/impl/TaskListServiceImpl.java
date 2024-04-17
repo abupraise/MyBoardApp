@@ -67,7 +67,7 @@ public class TaskListServiceImpl implements TaskListService {
 
 
     @Override
-    public TaskList deleteTaskListById(long id) {
+    public TaskList deleteTask(long id) {
         Optional<TaskList> taskListOptional = taskListRepository.findById(id);
         if (taskListOptional.isPresent()){
             TaskList taskList = taskListOptional.get();
