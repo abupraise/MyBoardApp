@@ -7,6 +7,7 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundExce
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.EmailDetails;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.request.UpdateUserRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
@@ -184,12 +185,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse editUser(Long id, RegisterRequest registerRequest) {
+    public UserResponse editUser(Long id, UpdateUserRequest updateUserRequest) {
         AppUser appUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("No User associated with " + id));
-        appUser.setFirstName(registerRequest.getFirstName());
-        appUser.setLastName(registerRequest.getLastName());
-        appUser.setPhoneNumber(registerRequest.getPhoneNumber());
+        appUser.setFirstName(updateUserRequest.getFirstName());
+        appUser.setLastName(updateUserRequest.getLastName());
+        appUser.setPhoneNumber(updateUserRequest.getPhoneNumber());
         userRepository.save(appUser);
         return UserResponse.builder()
                 .responseMessage(UserUtils.USER_UPDATE_MESSAGE)

@@ -5,6 +5,7 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.request.UpdateUserRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
@@ -46,6 +47,9 @@ class UserServiceImplTest {
 
     @Mock
     private EmailService emailService;
+
+    @Mock
+    UpdateUserRequest updateUserRequest;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -237,7 +241,7 @@ class UserServiceImplTest {
         when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Testing editUser method
-        UserResponse editedUser = userService.editUser(userId, registerRequest);
+        UserResponse editedUser = userService.editUser(userId, updateUserRequest);
 
         // Assertions
         verify(userRepository).findById(userId);
