@@ -1,5 +1,6 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.controller;
 
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskService;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +32,9 @@ public class TaskController  {
         return new ResponseEntity<>("Task Deleted Successfully!", HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/new_task/{userId}/{taskListId}")
+    public ResponseEntity<TaskRequest> createTask(@PathVariable Long userId, @PathVariable Long taskListId, @RequestBody TaskRequest createRequest) {
+        TaskRequest createdTask = taskService.createTask(userId, taskListId, createRequest);
+        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
+    }
 }

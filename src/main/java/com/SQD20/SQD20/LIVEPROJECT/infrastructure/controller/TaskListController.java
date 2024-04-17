@@ -4,6 +4,7 @@ import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskListService;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.TaskListServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,21 @@ public class TaskListController {
 
     }
 
+
+    @PostMapping("/create-task-list/{id}")
+    public ResponseEntity<TaskResponse> createTaskList(@PathVariable Long id, @RequestBody TaskListRequest request){
+        TaskResponse createdList = taskListService.createTaskList(id, request);
+        return  new ResponseEntity<>(createdList,HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/delete-task-list/{id}")
+    public ResponseEntity<TaskList> deleteTask(@PathVariable long id){
+       TaskList deletedTaskList = taskListService.deleteTask(id);
+        if(deletedTaskList != null){
+            return new ResponseEntity<>(deletedTaskList, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
 
 }
