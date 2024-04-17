@@ -76,7 +76,7 @@ public class TaskListServiceImpl implements TaskListService {
             taskListRepository.delete(taskList);
             return taskList;
         }
-        return null;
+        throw new TaskNotFoundException("Task not found");
     }
 
 }
