@@ -247,7 +247,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserById() {
+    void testViewUser() {
         // Mocking data
         Long userId = 1L;
 
@@ -269,7 +269,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserById_UserNotFound() {
+    void testViewUser_UserNotFound() {
         // Mocking data
         Long userId = 1L;
 
