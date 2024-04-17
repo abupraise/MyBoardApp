@@ -7,14 +7,17 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UserNotFoundExceptio
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
+import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import com.SQD20.SQD20.LIVEPROJECT.utils.TaskListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +33,9 @@ class TaskListServiceImplTest {
 
     @InjectMocks
     private TaskListServiceImpl taskListService;
+
+    @Mock
+    private TaskRepository taskRepository;
 
     @BeforeEach
     void setUp() {
@@ -111,5 +117,52 @@ class TaskListServiceImplTest {
         assertThrows(UserNotFoundException.class, () -> taskListService.createTaskList(userId, request));
         verify(userRepository, times(1)).findById(userId);
         verify(taskListRepository, never()).save(any(TaskList.class));
+    }
+    @Test
+    void testDeleteTaskListByTitle() {
+        AppUser user = new AppUser();
+        user.setEmail("jane.doe@example.org");
+        user.setFirstName("Jane");
+        user.setIsEnabled(true);
+        user.setLastName("Doe");
+        user.setPassword("iloveyou");
+        user.setPhoneNumber("6625550144");
+        user.setTaskList(new ArrayList<>());
+
+        TaskList taskList = new TaskList();
+        taskList.setDescription("The characteristics of someone or something");
+        taskList.setTasks(new ArrayList<>());
+        taskList.setTitle("Dr");
+        taskList.setUser(user);
+        Optional<TaskList> ofResult = Optional.of(taskList);
+        doNothing().when(taskListRepository).delete(Mockito.any());
+        when(taskListRepository.findByTitle(Mockito.any())).thenReturn(ofResult);
+        doNothing().when(taskListRepository).deleteAll(Mockito.any());
+
+        assertThrows(TaskListNotFoundException.class, () -> taskListService.deleteTaskListByTitle("Dr"));
+    }
+    @Test
+    void testDeleteTaskListById() {
+
+        AppUser user = new AppUser();
+        user.setEmail("jane.doe@example.org");
+        user.setFirstName("Jane");
+        user.setIsEnabled(true);
+        user.setLastName("Doe");
+        user.setPassword("iloveyou");
+        user.setPhoneNumber("6625550144");
+        user.setTaskList(new ArrayList<>());
+
+        TaskList taskList = new TaskList();
+        taskList.setDescription("The characteristics of someone or something");
+        taskList.setTasks(new ArrayList<>());
+        taskList.setTitle("Dr");
+        taskList.setUser(user);
+        Optional<TaskList> ofResult = Optional.of(taskList);
+        doNothing().when(taskListRepository).delete(Mockito.any());
+        when(taskListRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
+        doNothing().when(taskListRepository).deleteAll(Mockito.any());
+
+        assertThrows(TaskListNotFoundException.class, () -> taskListService.deleteTaskListById(1L));
     }
 }

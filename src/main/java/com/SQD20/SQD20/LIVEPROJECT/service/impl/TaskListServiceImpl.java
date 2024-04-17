@@ -65,4 +65,29 @@ public class TaskListServiceImpl implements TaskListService {
                 .build();
     }
 
+    @Override
+    public void deleteTaskListByTitle(String title) {
+        Optional<TaskList> taskListOptional = taskListRepository.findByTitle(title);
+        if (taskListOptional.isPresent()){
+            TaskList taskList = taskListOptional.get();
+            List<Task> tasks = taskList.getTasks();
+            taskRepository.deleteAll(tasks);
+            taskListRepository.delete(taskList);
+        }
+        throw new TaskListNotFoundException("Task list not found");
+
+    }
+
+    @Override
+    public void deleteTaskListById(long id) {
+        Optional<TaskList> taskListOptional = taskListRepository.findById(id);
+        if (taskListOptional.isPresent()){
+            TaskList taskList = taskListOptional.get();
+            List<Task> tasks = taskList.getTasks();
+            taskRepository.deleteAll(tasks);
+            taskListRepository.delete(taskList);
+        }
+        throw new TaskListNotFoundException("Task list not found");
+    }
+
 }

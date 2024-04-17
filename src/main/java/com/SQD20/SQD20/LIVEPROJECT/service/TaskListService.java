@@ -9,4 +9,8 @@ public interface TaskListService {
     public TaskList updateTaskListByUserId(Long taskListId, TaskListRequest taskListRequest);
     TaskResponse createTaskList(Long id, TaskListRequest request);
 
+    void deleteTaskListByTitle(String title);
+
+    void deleteTaskListById(long Id);
+
 }
