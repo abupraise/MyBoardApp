@@ -37,5 +37,14 @@ public class TaskListController {
         return  new ResponseEntity<>(createdList,HttpStatus.CREATED);
     }
 
+    @DeleteMapping("/delete-task-list/{id}")
+    public ResponseEntity<TaskList> deleteTask(@PathVariable long id){
+       TaskList deletedTaskList = taskListService.deleteTask(id);
+        if(deletedTaskList != null){
+            return new ResponseEntity<>(deletedTaskList, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
 
 }

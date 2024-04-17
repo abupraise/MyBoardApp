@@ -1,7 +1,9 @@
+com/SQD20/SQD20/LIVEPROJECT/payload/response/TaskResponse.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/TaskList.class
 com/SQD20/SQD20/LIVEPROJECT/payload/response/RegisterResponse$RegisterResponseBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/config/ApplicationConfig.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/AppUser.class
+com/SQD20/SQD20/LIVEPROJECT/payload/response/UserResponse$UserResponseBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/EmailNotSentException.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/RegisterRequest$RegisterRequestBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/service/impl/EmailServiceImpl.class
@@ -10,6 +12,7 @@ com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/GlobalExceptionHandler.clas
 com/SQD20/SQD20/LIVEPROJECT/service/TaskListService.class
 com/SQD20/SQD20/LIVEPROJECT/domain/enums/Status.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/config/SecurityConfig.class
+com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/UserNotFoundException.class
 com/SQD20/SQD20/LIVEPROJECT/repository/UserRepository.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/TaskNotFoundException.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/Task$TaskBuilder.class
@@ -18,10 +21,13 @@ com/SQD20/SQD20/LIVEPROJECT/domain/entites/TaskList$TaskListBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/AppUser$AppUserBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/controller/TaskListController.class
 com/SQD20/SQD20/LIVEPROJECT/domain/enums/PriorityLevel.class
+com/SQD20/SQD20/LIVEPROJECT/payload/request/TaskListRequest.class
 com/SQD20/SQD20/LIVEPROJECT/payload/response/RegisterResponse.class
+com/SQD20/SQD20/LIVEPROJECT/payload/response/UserResponse.class
 com/SQD20/SQD20/LIVEPROJECT/payload/response/AuthenticationResponse.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/TaskListNotFoundException.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/config/JwtService.class
+com/SQD20/SQD20/LIVEPROJECT/utils/TaskListUtils.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/ErrorDetails.class
 com/SQD20/SQD20/LIVEPROJECT/service/impl/UserServiceImpl.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/AuthenticationRequest.class
@@ -35,8 +41,10 @@ com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/UsernameNotFoundException.c
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/ErrorDetails$ErrorDetailsBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/utils/EmailTemplate.class
 com/SQD20/SQD20/LIVEPROJECT/service/impl/TaskListServiceImpl.class
+com/SQD20/SQD20/LIVEPROJECT/payload/response/TaskResponse$TaskResponseBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/BaseClass.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/Task.class
+com/SQD20/SQD20/LIVEPROJECT/infrastructure/controller/UserController.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/EmailDetails$EmailDetailsBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/AuthenticationRequest$AuthenticationRequestBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/controller/AuthController.class

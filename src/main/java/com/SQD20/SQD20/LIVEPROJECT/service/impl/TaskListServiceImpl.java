@@ -65,4 +65,18 @@ public class TaskListServiceImpl implements TaskListService {
                 .build();
     }
 
+
+    @Override
+    public TaskList deleteTask(long id) {
+        Optional<TaskList> taskListOptional = taskListRepository.findById(id);
+        if (taskListOptional.isPresent()){
+            TaskList taskList = taskListOptional.get();
+            List<Task> tasks = taskList.getTasks();
+            taskRepository.deleteAll(tasks);
+            taskListRepository.delete(taskList);
+            return taskList;
+        }
+        throw new TaskNotFoundException("Task not found");
+    }
+
 }
