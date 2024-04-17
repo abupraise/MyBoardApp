@@ -2,6 +2,7 @@ package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.PasswordNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.EmailDetails;
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
 
-        if (userRepository.existsByEmail(registerRequest.getEmail())){
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return RegisterResponse.builder()
                     .responseCode(UserUtils.ACCOUNT_EXISTS_CODE)
                     .responseMessage(UserUtils.ACCOUNT_EXISTS_MESSAGE)
@@ -129,11 +130,11 @@ public class UserServiceImpl implements UserService {
     public String verifyEmail(String token) {
         String username = jwtService.getUserName(token);
 //        log.info(username);
-        if(username != null){
+        if (username != null) {
             Optional<AppUser> user = userRepository.findByEmail(username);
 //            log.info(username);
-            if(user.isPresent()){
-                if(user.get().isEnabled()){
+            if (user.isPresent()) {
+                if (user.get().isEnabled()) {
                     return "User has been verified!";
                 } else {
                     user.get().setIsEnabled(true);
@@ -142,7 +143,7 @@ public class UserServiceImpl implements UserService {
                     return "Email Verified";
                 }
 
-            } else{
+            } else {
                 return "User does not exist";
             }
         }
@@ -212,5 +213,16 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-
+    @Override
+    public String resetPassword(String email, String oldPassword, String newPassword) {
+        AppUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("No User with this email: " + email));
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new PasswordNotFoundException("Old password does not match the current password!");
+        } else {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return "Your Password has been reset successfully, login with the new password ";
+        }
+    }
 }
