@@ -226,4 +226,9 @@ public class UserServiceImpl implements UserService {
             return "Your Password has been reset successfully, login with the new password ";
         }
     }
+
+    @Override
+    public String forgotPassword(String email) {
+        return null;
+    }
 }

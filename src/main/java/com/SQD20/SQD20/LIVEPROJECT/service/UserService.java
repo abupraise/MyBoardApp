@@ -18,6 +18,7 @@ public interface UserService {
     UserResponse editUser(Long id, UpdateUserRequest updateUserRequest);
     UserResponse viewUser(Long id);
     public String resetPassword(String email, String oldPassword, String newPassword);
+    public String forgotPassword(String email);
 
 
 }
