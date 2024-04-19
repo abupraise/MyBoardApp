@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -228,7 +229,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String forgotPassword(String email) {
+    public ResponseEntity<?> forgotPasswordEmail(String email) {
+        // Find the user by email
+        AppUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("No User with this email: " + email));
+
+        // Check if the user is enabled
+        if (user.isEnabled()) {
+            // Generate a reset token
+            String resetToken = jwtService.generateToken(user);
+
+            // Construct the email details
+            EmailDetails emailDetails = EmailDetails.builder()
+                    .recipient(user.getEmail())
+                    .subject("Reset Your Password")
+                    .messageBody(EmailTemplate.getEmailMessage(user.getFirstName(), baseUrl, resetToken))
+                    .build();
+            try {
+                // Send the password reset email
+                emailService.sendEmailAlert(emailDetails);
+                return ResponseEntity.ok().body("Password reset email sent successfully.");
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to send password reset email. Please try again later.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User account is not enabled. Please contact support for assistance.");
+        }
+    }
+
+
+    @Override
+    public String forgotPassword(String newPassword, String confirmPassword) {
         return null;
     }
 }

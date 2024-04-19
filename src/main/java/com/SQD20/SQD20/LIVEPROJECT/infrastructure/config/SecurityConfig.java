@@ -33,6 +33,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/verify-email",
                                 "/api/v1/auth/users/resend-email",
+                                "/api/v1/auth/forgot-password-email",
                                 "/swagger-ui.html",
                                 "/webjars/**",
                                 "/swagger-ui/**",

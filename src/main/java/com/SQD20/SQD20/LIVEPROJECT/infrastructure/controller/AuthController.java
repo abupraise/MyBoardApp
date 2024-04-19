@@ -59,4 +59,9 @@ public class AuthController {
         return new ResponseEntity<>(userService.resetPassword(email,oldPassword, newPassword), HttpStatus.OK);
     }
 
+    @PostMapping("/forgot-password-email")
+    public ResponseEntity<?> forgotPasswordEmail(@RequestParam String email){
+        return new ResponseEntity<>(userService.forgotPasswordEmail(email), HttpStatus.OK);
+    }
+
 }
