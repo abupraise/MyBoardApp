@@ -37,4 +37,10 @@ public class TaskController  {
         TaskRequest createdTask = taskService.createTask(userId, taskListId, createRequest);
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
+
+    @PatchMapping("/updateStatus/{taskId}")
+    public ResponseEntity<String> updateStatus(@PathVariable Long taskId, @RequestBody TaskRequest updateStatus){
+        taskService.updateTaskStatus(taskId, updateStatus);
+        return ResponseEntity.ok("Task Status updated successfully");
+    }
 }
