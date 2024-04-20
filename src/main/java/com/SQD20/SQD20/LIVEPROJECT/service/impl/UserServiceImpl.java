@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     @Override
     public RegisterResponse register(@Valid RegisterRequest registerRequest) {
@@ -108,6 +111,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
+
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
