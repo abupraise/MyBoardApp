@@ -51,6 +51,8 @@ public class AuthController {
         return ResponseEntity.ok(userService.verifyEmail(token));
     }
 
+
+
     @PostMapping("/users/resend-email")
     public ResponseEntity<?> resendEmailVerification(@RequestParam(name = "email") String email) {
         ResponseEntity<?> response = userService.resendEmailVerification(email);
