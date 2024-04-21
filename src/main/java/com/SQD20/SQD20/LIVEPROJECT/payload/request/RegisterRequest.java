@@ -25,7 +25,7 @@ public class RegisterRequest {
     @Email
     private String email;
 
-    @Size(min = 10, max = 20, message = "Phone number must be at least 2 characters long")
+    @Size(min = 10, max = 20, message = "Phone number must be at least 10 characters long")
     @NotBlank(message = "Phone number must not be empty")
     private String phoneNumber;
 
