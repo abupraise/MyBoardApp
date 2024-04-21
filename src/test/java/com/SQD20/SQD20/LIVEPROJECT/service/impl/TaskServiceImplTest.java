@@ -9,6 +9,7 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundExce
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TasksResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 
@@ -20,6 +21,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -192,5 +195,25 @@ public class TaskServiceImplTest {
         verify(taskListRepository).findById(taskListId);
         verify(taskListRepository).findById(1L);
         verifyNoInteractions(taskRepository);
+    }
+
+    @Test
+    void getTasksByTaskListId_ShouldReturnListOfTasksResponse() {
+        // Arrange
+        Long taskListId = 1L;
+        Task mockTask1 = new Task();
+        Task mockTask2 = new Task();
+        List<Task> mockTasks = Arrays.asList(mockTask1, mockTask2);
+
+        when(taskRepository.findByTaskListId(taskListId)).thenReturn(mockTasks);
+
+        // Act
+        List<TasksResponse> results = taskService.getTasksByTaskListId(taskListId);
+
+        // Assert
+        assertEquals(2, results.size());
+        verify(taskRepository).findByTaskListId(taskListId);
+        assertEquals(results.get(0).getTitle(), null);
+        assertEquals(results.get(1).getTitle(), null);
     }
 }
