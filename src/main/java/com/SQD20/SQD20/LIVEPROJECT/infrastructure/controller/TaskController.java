@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.controller;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TasksResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskService;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,5 +45,14 @@ public class TaskController  {
     public ResponseEntity<Task> updateStatus(@PathVariable Long taskId, @RequestBody TaskRequest updateStatus){
         Task updatedTask = taskService.updateTaskStatus(taskId, updateStatus);
         return new ResponseEntity<>(updatedTask, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/get_tasks/{taskListId}")
+    public ResponseEntity<List<TasksResponse>> getTasksByTaskListId(@PathVariable Long taskListId) {
+        List<TasksResponse> taskResponses = taskService.getTasksByTaskListId(taskListId);
+        if (taskResponses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(taskResponses);
     }
 }
