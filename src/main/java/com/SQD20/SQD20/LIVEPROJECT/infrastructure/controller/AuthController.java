@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +62,20 @@ public class AuthController {
 
     @PostMapping("/forgot-password-email")
     public ResponseEntity<?> forgotPasswordEmail(@RequestParam String email){
-        return new ResponseEntity<>(userService.forgotPasswordEmail(email), HttpStatus.OK);
+        ResponseEntity<?> response = userService.forgotPasswordEmail(email);
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
+    @GetMapping("/verify-forgot-password-email")
+    public String verifyForgotPasswordEmail(@RequestParam("resetToken") String token) throws IOException {
+        return userService.verifyForgotPasswordEmail(token);
+    }
+
+    @PostMapping("/reset-forgot-password")
+    public String resetForgotPassword(@RequestParam("newPassword") String newPassword,
+                                @RequestParam("confirmPassword") String confirmPassword,
+                                @RequestParam("email") String email) {
+        return userService.forgotPassword(email,newPassword, confirmPassword);
     }
 
 }

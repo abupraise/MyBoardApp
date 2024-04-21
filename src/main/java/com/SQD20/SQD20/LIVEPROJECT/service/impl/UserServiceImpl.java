@@ -16,9 +16,12 @@ import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.EmailTemplate;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +30,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +50,10 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private  final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    @Autowired
+    private  HttpServletResponse response;
+
 
     @Override
     public RegisterResponse register(@Valid RegisterRequest registerRequest) {
@@ -230,38 +238,68 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> forgotPasswordEmail(String email) {
-        // Find the user by email
-        AppUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No User with this email: " + email));
-
-        // Check if the user is enabled
-        if (user.isEnabled()) {
-            // Generate a reset token
-            String resetToken = jwtService.generateToken(user);
-
-            // Construct the email details
-            EmailDetails emailDetails = EmailDetails.builder()
-                    .recipient(user.getEmail())
-                    .subject("Reset Your Password")
-                    .messageBody(EmailTemplate.getEmailMessage(user.getFirstName(), baseUrl, resetToken))
-                    .build();
+            Optional<AppUser> optionalAppUser = userRepository.findByEmail(email);
+            if (optionalAppUser.isEmpty()) {
+                return ResponseEntity.badRequest().body("User with the provided email does not exist.");
+            }
+            AppUser user = optionalAppUser.get();
             try {
-                // Send the password reset email
-                emailService.sendEmailAlert(emailDetails);
+                String resetToken = jwtService.generateToken(user);
+                String link = EmailTemplate.getForgotPasswordVerificationUrl(baseUrl, resetToken);
+                EmailDetails emailDetails = EmailDetails.builder()
+                        .recipient(user.getEmail())
+                        .subject("Reset Your Password")
+                        .messageBody(EmailTemplate.getEmailMessage(user.getFirstName(), baseUrl, resetToken))
+                        .build();
+                //emailService.sendEmailAlert(emailDetails);
+                emailService.sendHtmlMessageForResetPassword(emailDetails,user.getFirstName(),link);
                 return ResponseEntity.ok().body("Password reset email sent successfully.");
             } catch (Exception e) {
+                e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Failed to send password reset email. Please try again later.");
             }
+        }
+
+    @Override
+    public String verifyForgotPasswordEmail(String token) throws IOException {
+        String username = jwtService.getUserName(token);
+        if (username != null) {
+            Optional<AppUser> userOptional = userRepository.findByEmail(username);
+            if (userOptional.isPresent()) {
+                AppUser user = userOptional.get();
+                // Check if the token is valid for resetting the password
+                if (jwtService.validateToken(token)) {
+                    // If the token is valid, return appropriate message
+                    response.sendRedirect("https://www.google.com");
+                    return "Email Verified for Password Reset";
+                } else {
+                    // If the token is invalid, return appropriate message
+                    return "Invalid or Expired Token";
+                }
+            } else {
+                // If the user does not exist, return appropriate message
+                return "User does not exist";
+            }
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("User account is not enabled. Please contact support for assistance.");
+            return "Invalid Token or Broken Link";
         }
     }
 
 
+
     @Override
-    public String forgotPassword(String newPassword, String confirmPassword) {
-        return null;
+    public String forgotPassword(String email, String newPassword, String confirmPassword) {
+        Optional<AppUser> optionalAppUser = userRepository.findByEmail(email);
+        if (optionalAppUser.isEmpty()) {
+            return "User with the provided email does not exist.";
+        }
+        AppUser user = optionalAppUser.get();
+        if (!newPassword.equals(confirmPassword)) {
+            return "New password and confirm password do not match.";
+        }
+        String encryptedPassword = passwordEncoder.encode(newPassword);
+        userRepository.updateUserPassword(user.getEmail(), encryptedPassword);
+        return "Password reset successfully. You can now login with your new password.";
     }
 }

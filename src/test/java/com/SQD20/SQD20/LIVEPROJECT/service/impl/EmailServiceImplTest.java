@@ -13,6 +13,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.Objects;
 
@@ -25,11 +26,14 @@ class EmailServiceImplTest {
 
     @Mock
     private JavaMailSender javaMailSender;
+    @Mock
+    private  SpringTemplateEngine tEngine;
+
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        emailService = new EmailServiceImpl(javaMailSender);
+        emailService = new EmailServiceImpl(javaMailSender,tEngine);
     }
 
     @Test

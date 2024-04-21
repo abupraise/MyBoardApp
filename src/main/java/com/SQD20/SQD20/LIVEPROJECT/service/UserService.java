@@ -9,6 +9,8 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 public interface UserService {
     public RegisterResponse register(RegisterRequest registerRequest);
@@ -19,7 +21,6 @@ public interface UserService {
     UserResponse viewUser(Long id);
     public String resetPassword(String email, String oldPassword, String newPassword);
     public  ResponseEntity<?> forgotPasswordEmail(String email);
-    public String forgotPassword(String newPassword, String confirmPassword);
-
-
+    public String verifyForgotPasswordEmail(String token) throws IOException;
+    String forgotPassword(String email, String newPassword, String confirmPassword);
 }
