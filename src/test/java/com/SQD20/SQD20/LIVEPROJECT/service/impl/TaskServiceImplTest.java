@@ -254,23 +254,4 @@ public class TaskServiceImplTest {
         assertEquals(results.get(1).getTitle(), null);
     }
 
-    @Test
-    void getTasksByTaskListId_ShouldReturnListOfTasksResponse() {
-        // Arrange
-        Long taskListId = 1L;
-        Task mockTask1 = new Task();
-        Task mockTask2 = new Task();
-        List<Task> mockTasks = Arrays.asList(mockTask1, mockTask2);
-
-        when(taskRepository.findByTaskListId(taskListId)).thenReturn(mockTasks);
-
-        // Act
-        List<TasksResponse> results = taskService.getTasksByTaskListId(taskListId);
-
-        // Assert
-        assertEquals(2, results.size());
-        verify(taskRepository).findByTaskListId(taskListId);
-        assertEquals(results.get(0).getTitle(), null);
-        assertEquals(results.get(1).getTitle(), null);
-    }
 }
