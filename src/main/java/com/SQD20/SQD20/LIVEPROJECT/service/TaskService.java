@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.service;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
+import com.SQD20.SQD20.LIVEPROJECT.domain.enums.Status;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.TasksResponse;
 

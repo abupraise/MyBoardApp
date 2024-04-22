@@ -46,7 +46,7 @@ public class TaskController  {
         Task updatedTask = taskService.updateTaskStatus(taskId, updateStatus);
         return new ResponseEntity<>(updatedTask, HttpStatus.CREATED);
     }
-  
+
     @GetMapping("/get_tasks/{taskListId}")
     public ResponseEntity<List<TasksResponse>> getTasksByTaskListId(@PathVariable Long taskListId) {
         List<TasksResponse> taskResponses = taskService.getTasksByTaskListId(taskListId);
