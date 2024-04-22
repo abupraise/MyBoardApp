@@ -5,6 +5,7 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,6 +58,10 @@ public class AuthController {
     @PutMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String email,  String oldPassword,@RequestHeader String newPassword){
         return new ResponseEntity<>(userService.resetPassword(email,oldPassword, newPassword), HttpStatus.OK);
+    }
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.logout(request));
     }
 
 }

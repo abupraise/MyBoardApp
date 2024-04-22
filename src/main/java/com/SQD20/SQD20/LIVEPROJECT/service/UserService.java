@@ -5,6 +5,7 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,4 +20,5 @@ public interface UserService {
     public String resetPassword(String email, String oldPassword, String newPassword);
 
 
+    String logout(HttpServletRequest request);
 }

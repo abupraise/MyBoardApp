@@ -2,6 +2,7 @@ package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.InvalidAccessException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.PasswordNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
@@ -15,6 +16,7 @@ import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.EmailTemplate;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -224,5 +229,18 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return "Your Password has been reset successfully, login with the new password ";
         }
+    }
+
+    @Override
+    public String logout(HttpServletRequest request) {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+       Authentication authentication = securityContext.getAuthentication();
+       if (authentication != null){
+         String email = authentication.getName();
+        authentication.setAuthenticated(false);
+        securityContext.setAuthentication(authentication);
+        return "logout success";
+       }
+        throw new InvalidAccessException("Invalid access");
     }
 }
