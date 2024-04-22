@@ -6,6 +6,7 @@ import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TasksResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,5 +74,25 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.save(task);
             return createRequest;
     }
+
+    @Override
+    public List<TasksResponse> getTasksByTaskListId(Long taskListId) {
+        List<Task> tasks = taskRepository.findByTaskListId(taskListId);
+        return tasks.stream()
+                .map(this::convertToTaskResponse)
+                .collect(Collectors.toList());
+    }
+
+    private TasksResponse convertToTaskResponse(Task task) {
+        return new TasksResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getDeadline(),
+                task.getPriorityLevel(),
+                task.getStatus()
+        );
+    }
+
 }
 
