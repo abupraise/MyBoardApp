@@ -9,7 +9,11 @@ public class EmailTemplate {
                 getVerificationUrl(baseUrl, token) + "\n\nThe support Team";
     }
 
-    private static String getVerificationUrl( String baseUrl, String token) {
+    public static String getVerificationUrl( String baseUrl, String token) {
         return baseUrl + "/api/v1/auth/verify-email?token=" + token;
+    }
+
+    public static String getForgotPasswordVerificationUrl(String baseUrl, String resetToken) {
+        return baseUrl + "/api/v1/auth/verify-forgot-password-email?resetToken=" + resetToken;
     }
 }
