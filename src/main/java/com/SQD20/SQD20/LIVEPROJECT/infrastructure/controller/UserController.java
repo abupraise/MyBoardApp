@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.controller;
 
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.request.UpdateUserRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,8 @@ public class UserController {
     private final UserService userService;
 
     @PutMapping("/{id}/edit-user")
-    public ResponseEntity<UserResponse> editUser(@PathVariable Long id, @RequestBody RegisterRequest registerRequest){
-        UserResponse updatedUser = userService.editUser(id, registerRequest);
+    public ResponseEntity<UserResponse> editUser(@PathVariable Long id, @RequestBody UpdateUserRequest updateUserRequest){
+        UserResponse updatedUser = userService.editUser(id, updateUserRequest);
         return new ResponseEntity<>(updatedUser, HttpStatus.CREATED);
     }
     @GetMapping("/{id}")

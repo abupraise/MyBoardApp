@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,6 +62,24 @@ public class AuthController {
     @PutMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestParam String email,  String oldPassword,@RequestHeader String newPassword){
         return new ResponseEntity<>(userService.resetPassword(email,oldPassword, newPassword), HttpStatus.OK);
+    }
+
+    @PostMapping("/forgot-password-email")
+    public ResponseEntity<?> forgotPasswordEmail(@RequestParam String email){
+        ResponseEntity<?> response = userService.forgotPasswordEmail(email);
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
+    @GetMapping("/verify-forgot-password-email")
+    public String verifyForgotPasswordEmail(@RequestParam("resetToken") String token) throws IOException {
+        return userService.verifyForgotPasswordEmail(token);
+    }
+
+    @PostMapping("/reset-forgot-password")
+    public String resetForgotPassword(@RequestParam("newPassword") String newPassword,
+                                @RequestParam("confirmPassword") String confirmPassword,
+                                @RequestParam("email") String email) {
+        return userService.forgotPassword(email,newPassword, confirmPassword);
     }
 
 }

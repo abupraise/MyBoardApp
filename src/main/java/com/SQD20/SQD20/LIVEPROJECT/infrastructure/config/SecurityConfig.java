@@ -25,6 +25,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+        //api/v1/auth/verify-forgot-password-email
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
@@ -32,7 +33,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/verify-email",
+                                "/api/v1/auth/verify-forgot-password-email/**",
                                 "/api/v1/auth/users/resend-email",
+                                "/api/v1/auth/forgot-password-email/**",
+                                "/api/v1/auth/reset-forgot-password/**",
                                 "/swagger-ui.html",
                                 "/webjars/**",
                                 "/swagger-ui/**",
