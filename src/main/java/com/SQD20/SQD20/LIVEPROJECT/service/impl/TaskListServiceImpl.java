@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -76,5 +77,24 @@ public class TaskListServiceImpl implements TaskListService {
         }
         throw new TaskNotFoundException("Task not found");
     }
+
+    @Override
+    public List<TaskListResponse> getAllTaskList(Long userID) {
+        List<TaskList> taskLists = taskListRepository.findByUserId(userID);
+        if (taskLists.isEmpty()) {
+            throw new TaskListNotFoundException("No task lists found for user with ID: " + userID);
+        }
+        return taskLists.stream().map((taskList) -> mapToResponse(taskList)).collect(Collectors.toList());
+    }
+
+    TaskListResponse mapToResponse(TaskList task){
+        TaskListResponse response = TaskListResponse.builder()
+                .description(task.getDescription())
+                .title(task.getTitle())
+                .build();
+        return response;
+
+    }
+
 
 }
