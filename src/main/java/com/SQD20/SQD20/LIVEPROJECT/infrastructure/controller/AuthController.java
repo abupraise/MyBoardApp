@@ -5,6 +5,7 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +50,8 @@ public class AuthController {
     public ResponseEntity<String> verifyEmail(@RequestParam(name = "token") String token ){
         return ResponseEntity.ok(userService.verifyEmail(token));
     }
+
+
 
     @PostMapping("/users/resend-email")
     public ResponseEntity<?> resendEmailVerification(@RequestParam(name = "email") String email) {

@@ -5,7 +5,7 @@ import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UserNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
-import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskListResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
@@ -94,7 +94,7 @@ class TaskListServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
 
         // Method call
-        TaskResponse response = taskListService.createTaskList(userId, request);
+        TaskListResponse response = taskListService.createTaskList(userId, request);
 
         // Verifications
         verify(userRepository, times(1)).findById(userId);
