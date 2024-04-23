@@ -41,6 +41,12 @@ public class TaskController  {
         return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
+    @PatchMapping("/update-status/{taskId}")
+    public ResponseEntity<Task> updateStatus(@PathVariable Long taskId, @RequestBody TaskRequest updateStatus){
+        Task updatedTask = taskService.updateTaskStatus(taskId, updateStatus);
+        return new ResponseEntity<>(updatedTask, HttpStatus.CREATED);
+    }
+
     @GetMapping("/get_tasks/{taskListId}")
     public ResponseEntity<List<TasksResponse>> getTasksByTaskListId(@PathVariable Long taskListId) {
         List<TasksResponse> taskResponses = taskService.getTasksByTaskListId(taskListId);

@@ -1,12 +1,9 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.controller;
 
-import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
-import com.SQD20.SQD20.LIVEPROJECT.domain.entites.Task;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.TaskList;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
-import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskListResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskListService;
-import com.SQD20.SQD20.LIVEPROJECT.service.impl.TaskListServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +29,8 @@ public class TaskListController {
 
 
     @PostMapping("/create-task-list/{id}")
-    public ResponseEntity<TaskResponse> createTaskList(@PathVariable Long id, @RequestBody TaskListRequest request){
-        TaskResponse createdList = taskListService.createTaskList(id, request);
+    public ResponseEntity<TaskListResponse> createTaskList(@PathVariable Long id, @RequestBody TaskListRequest request){
+        TaskListResponse createdList = taskListService.createTaskList(id, request);
         return  new ResponseEntity<>(createdList,HttpStatus.CREATED);
     }
 

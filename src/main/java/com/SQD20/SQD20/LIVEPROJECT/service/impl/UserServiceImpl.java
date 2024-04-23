@@ -33,6 +33,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +56,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private  HttpServletResponse response;
 
+    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     @Override
     public RegisterResponse register(@Valid RegisterRequest registerRequest) {
@@ -176,7 +179,6 @@ public class UserServiceImpl implements UserService {
 
         // Generate a new verification token
         String jwtToken = jwtService.generateToken(user);
-        String link = EmailTemplate.getVerificationUrl(baseUrl, jwtToken);
 
         // Send the verification email
         EmailDetails emailDetails = EmailDetails.builder()
