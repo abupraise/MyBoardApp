@@ -188,7 +188,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         try {
-            emailService.sendHtmlMessageToVerifyEmail(emailDetails,user.getFirstName(),link);
+            emailService.sendEmailAlert(emailDetails);
             return ResponseEntity.ok().body("Verification email resent successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
