@@ -23,14 +23,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -372,5 +372,34 @@ class UserServiceImplTest {
         verify(userRepository, never()).updateUserPassword(anyString(), anyString());
     }
 
+
+    @Test
+    void loadUserByUsername_UserFound_ReturnsUserDetails() {
+
+        String email = "test@example.com";
+        String password = "password";
+        boolean isEnabled = true;
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setIsEnabled(isEnabled);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = userService.loadUserByUsername(email);
+
+        assertNotNull(userDetails);
+        assertEquals(email, userDetails.getUsername());
+        assertEquals(password, userDetails.getPassword());
+        assertTrue(userDetails.isEnabled());
+    }
+
+    @Test
+    void loadUserByUsername_UserNotFound_ThrowsException() {
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("nonexistent@example.com"));
+    }
 
 }

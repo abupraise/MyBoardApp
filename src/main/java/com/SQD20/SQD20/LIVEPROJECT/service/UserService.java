@@ -7,6 +7,7 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,4 +24,5 @@ public interface UserService {
     public  ResponseEntity<?> forgotPasswordEmail(String email);
     public String verifyForgotPasswordEmail(String token) throws IOException;
     String forgotPassword(String email, String newPassword, String confirmPassword);
+    public UserDetails loadUserByUsername(String username);
 }
