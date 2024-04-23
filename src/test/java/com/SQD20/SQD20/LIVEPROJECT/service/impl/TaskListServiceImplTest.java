@@ -9,6 +9,7 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskListResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
+import com.SQD20.SQD20.LIVEPROJECT.service.TaskListService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.TaskListUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -141,5 +141,53 @@ class TaskListServiceImplTest {
         doNothing().when(taskListRepository).deleteAll(Mockito.any());
 
         assertNotNull(taskListService.deleteTask(1L));
+    }
+
+
+
+
+    @Test
+    void testGetAllTaskList_Success() {
+        // Prepare test data
+        Long userId = 123L;
+        TaskList taskList1 = new TaskList();
+        taskList1.setId(1L);
+        taskList1.setTitle("TaskList 1");
+        taskList1.setDescription("Description 1");
+
+        TaskList taskList2 = new TaskList();
+        taskList2.setId(2L);
+        taskList2.setTitle("TaskList 2");
+        taskList2.setDescription("Description 2");
+
+        List<TaskList> taskLists = new ArrayList<>();
+        taskLists.add(taskList1);
+        taskLists.add(taskList2);
+
+        // Mock behavior of the repository
+        when(taskListRepository.findByUserId(userId)).thenReturn(taskLists);
+
+        // Call the method under test
+        List<TaskListResponse> taskListResponses = taskListService.getAllTaskList(userId);
+
+        // Verify the result
+        assertNotNull(taskListResponses);
+        assertEquals(2, taskListResponses.size());
+        for (TaskListResponse response : taskListResponses) {
+            assertEquals(TaskListUtils.TASK_LIST_CREATION_MESSAGE, response.getResponseMessage());
+            assertEquals(TaskListUtils.TASK_LIST_CREATION_SUCCESS_CODE, response.getResponseCode());
+        }
+    }
+
+    @Test
+    void testGetAllTaskList_EmptyList() {
+        // Prepare test data
+        Long userId = 123L;
+
+        // Mock behavior of the repository
+        when(taskListRepository.findByUserId(userId)).thenReturn(new ArrayList<>());
+
+        // Verify that TaskListNotFoundException is thrown
+        assertThrows(TaskListNotFoundException.class, () -> taskListService.getAllTaskList(userId));
     }
 }

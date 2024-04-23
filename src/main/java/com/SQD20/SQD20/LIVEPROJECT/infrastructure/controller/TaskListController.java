@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/task-list")
@@ -42,6 +44,11 @@ public class TaskListController {
         }else{
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+    }
+
+    @GetMapping("/get-task-list/{id}")
+    public ResponseEntity<List<TaskListResponse>> getAllTaskList(@PathVariable(value = "id") long userId){
+        return new ResponseEntity<>(taskListService.getAllTaskList(userId),HttpStatus.OK);
     }
 
 }
