@@ -103,5 +103,26 @@ public class EmailServiceImpl implements EmailService {
         log.info("Sending email: to {}",message.getRecipient());
     }
 
+    @Override
+    public void sendHtmlMessageToVerifyEmail(EmailDetails message, String name, String link) throws MessagingException, JsonProcessingException {
+        MimeMessage msg = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(msg, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+        Context context = new Context();
+        Map<String, Object> variables = Map.of(
+                "name", name,
+                "link", link
+        );
+        context.setVariables(variables);
+        helper.setFrom(senderMail);
+        helper.setTo(message.getRecipient());
+        helper.setSubject(message.getSubject());
+        String html = tEngine.process("email-verification", context);
+        helper.setText(html, true);
+
+        javaMailSender.send(msg);
+        log.info("Sending email: to {}",message.getRecipient());
+    }
+
+
 
 }

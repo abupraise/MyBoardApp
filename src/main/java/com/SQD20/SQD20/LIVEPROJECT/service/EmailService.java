@@ -14,4 +14,5 @@ public interface EmailService {
 
     public void sendSimpleMailMessage(String name, String to, String token);
 
+    void sendHtmlMessageToVerifyEmail(EmailDetails message, String name, String link) throws MessagingException, JsonProcessingException;
 }

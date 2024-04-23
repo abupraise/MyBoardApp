@@ -176,6 +176,7 @@ public class UserServiceImpl implements UserService {
 
         // Generate a new verification token
         String jwtToken = jwtService.generateToken(user);
+        String link = EmailTemplate.getVerificationUrl(baseUrl, jwtToken);
 
         // Send the verification email
         EmailDetails emailDetails = EmailDetails.builder()
@@ -185,7 +186,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         try {
-            emailService.sendEmailAlert(emailDetails);
+            emailService.sendHtmlMessageToVerifyEmail(emailDetails,user.getFirstName(),link);
             return ResponseEntity.ok().body("Verification email resent successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
