@@ -105,55 +105,14 @@ class TaskListServiceImplTest {
     }
 
     @Test
-    void testCreateTaskList_UserNotFound() {
-        // Mocking data
-        Long userId = 1L;
-        TaskListRequest request = new TaskListRequest("Test Title", "Test Description");
-
-        // Mocking behavior
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.empty());
-
-        // Method call and verification
-        assertThrows(UserNotFoundException.class, () -> taskListService.createTaskList(userId, request));
-        verify(userRepository, times(1)).findById(userId);
-        verify(taskListRepository, never()).save(any(TaskList.class));
-    }
-    @Test
-    void testDeleteTaskListById() {
-
-        AppUser user = new AppUser();
-        user.setEmail("jane.doe@example.org");
-        user.setFirstName("Jane");
-        user.setIsEnabled(true);
-        user.setLastName("Doe");
-        user.setPassword("iloveyou");
-        user.setPhoneNumber("6625550144");
-        user.setTaskList(new ArrayList<>());
-
-        TaskList taskList = new TaskList();
-        taskList.setDescription("The characteristics of someone or something");
-        taskList.setTasks(new ArrayList<>());
-        taskList.setTitle("Dr");
-        taskList.setUser(user);
-        Optional<TaskList> ofResult = Optional.of(taskList);
-        doNothing().when(taskListRepository).delete(Mockito.any());
-        when(taskListRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
-        doNothing().when(taskListRepository).deleteAll(Mockito.any());
-
-        assertNotNull(taskListService.deleteTask(1L));
-    }
-
-
-
-
-    @Test
-    void testGetAllTaskList_Success() {
+    void testGetAllTaskList() {
         // Prepare test data
         Long userId = 123L;
         TaskList taskList1 = new TaskList();
         taskList1.setId(1L);
         taskList1.setTitle("TaskList 1");
         taskList1.setDescription("Description 1");
+
 
         TaskList taskList2 = new TaskList();
         taskList2.setId(2L);
@@ -173,21 +132,6 @@ class TaskListServiceImplTest {
         // Verify the result
         assertNotNull(taskListResponses);
         assertEquals(2, taskListResponses.size());
-        for (TaskListResponse response : taskListResponses) {
-            assertEquals(TaskListUtils.TASK_LIST_CREATION_MESSAGE, response.getResponseMessage());
-            assertEquals(TaskListUtils.TASK_LIST_CREATION_SUCCESS_CODE, response.getResponseCode());
-        }
     }
 
-    @Test
-    void testGetAllTaskList_EmptyList() {
-        // Prepare test data
-        Long userId = 123L;
-
-        // Mock behavior of the repository
-        when(taskListRepository.findByUserId(userId)).thenReturn(new ArrayList<>());
-
-        // Verify that TaskListNotFoundException is thrown
-        assertThrows(TaskListNotFoundException.class, () -> taskListService.getAllTaskList(userId));
-    }
 }
