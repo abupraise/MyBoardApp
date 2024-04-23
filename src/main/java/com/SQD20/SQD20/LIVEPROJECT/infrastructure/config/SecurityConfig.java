@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/users/resend-email",
                                 "/api/v1/auth/forgot-password-email/**",
                                 "/api/v1/auth/reset-forgot-password/**",
+                                "/api/v1/auth/refreshToken",
                                 "/swagger-ui.html",
                                 "/webjars/**",
                                 "/swagger-ui/**",

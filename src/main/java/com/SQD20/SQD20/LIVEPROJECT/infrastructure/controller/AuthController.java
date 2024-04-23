@@ -1,5 +1,6 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.controller;
 
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +26,8 @@ import java.util.Map;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
     private final UserServiceImpl userService;
+
+    private final JwtService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Validated
@@ -81,5 +85,18 @@ public class AuthController {
                                 @RequestParam("email") String email) {
         return userService.forgotPassword(email,newPassword, confirmPassword);
     }
+
+    @PostMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String refreshTokenHeader) {
+
+        String username = jwtService.extractUsernameFromToken(refreshTokenHeader);
+
+        UserDetails userDetails = userService.loadUserByUsername(username);
+
+        String newAccessToken = jwtService.generateToken(userDetails);
+
+        return ResponseEntity.ok(newAccessToken);
+    }
+
 
 }
