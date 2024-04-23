@@ -123,6 +123,8 @@ public class UserServiceImpl implements UserService {
 
         AppUser user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        user.setToken(jwtToken);
+        userRepository.save(user);
         return AuthenticationResponse.builder()
                 .responseCode(UserUtils.LOGIN_SUCCESS_CODE)
                 .responseMessage(UserUtils.LOGIN_SUCCESS_MESSAGE)
@@ -236,10 +238,19 @@ public class UserServiceImpl implements UserService {
         SecurityContext securityContext = SecurityContextHolder.getContext();
        Authentication authentication = securityContext.getAuthentication();
        if (authentication != null){
-         String email = authentication.getName();
-        authentication.setAuthenticated(false);
-        securityContext.setAuthentication(authentication);
-        return "logout success";
+           String email = authentication.getName();
+           Optional<AppUser> appUser = userRepository.findByEmail(email);
+           if(appUser.isPresent()){
+               AppUser existingUser = appUser.get();
+               existingUser.setToken(null);
+               userRepository.save(existingUser);
+               securityContext.setAuthentication(null);
+               SecurityContextHolder.clearContext();
+               return "logout success";
+           }else {
+               throw new InvalidAccessException("Invalid User");
+           }
+
        }
         throw new InvalidAccessException("Invalid access");
     }

@@ -18,7 +18,5 @@ public interface UserService {
     UserResponse editUser(Long id, RegisterRequest registerRequest);
     UserResponse viewUser(Long id);
     public String resetPassword(String email, String oldPassword, String newPassword);
-
-
     String logout(HttpServletRequest request);
 }
