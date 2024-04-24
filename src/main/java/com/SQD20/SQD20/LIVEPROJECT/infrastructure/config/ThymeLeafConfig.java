@@ -1,4 +1,4 @@
-package com.SQD20.SQD20.LIVEPROJECT.config;
+package com.SQD20.SQD20.LIVEPROJECT.infrastructure.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;

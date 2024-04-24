@@ -16,6 +16,8 @@ import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.EmailTemplate;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +63,7 @@ public class UserServiceImpl implements UserService {
     private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     @Override
-    public RegisterResponse register(@Valid RegisterRequest registerRequest) {
+    public RegisterResponse register(@Valid RegisterRequest registerRequest) throws MessagingException, JsonProcessingException {
 
         // Validate email format
         String emailRegex = "^(.+)@(.+)$";
@@ -106,14 +108,14 @@ public class UserServiceImpl implements UserService {
 
 
         String jwtToken = jwtService.generateToken(newUser);
-
+        String link = EmailTemplate.getVerificationUrl(baseUrl, jwtToken);
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient(savedUser.getEmail())
                 .subject("ACCOUNT VERIFICATION")
                 .messageBody(EmailTemplate.getEmailMessage(savedUser.getFirstName(), baseUrl, jwtToken))
                 .build();
 
-        emailService.sendEmailAlert(emailDetails);
+        emailService.sendHtmlMessageToVerifyEmail(emailDetails, newUser.getFirstName(), link);
         return RegisterResponse.builder()
                 .responseCode(UserUtils.ACCOUNT_CREATION_SUCCESS_CODE)
                 .responseMessage(UserUtils.ACCOUNT_CREATION_SUCCESS_MESSAGE)
@@ -181,6 +183,7 @@ public class UserServiceImpl implements UserService {
 
         // Generate a new verification token
         String jwtToken = jwtService.generateToken(user);
+        String link = EmailTemplate.getVerificationUrl(baseUrl,jwtToken);
 
         // Send the verification email
         EmailDetails emailDetails = EmailDetails.builder()
@@ -190,7 +193,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         try {
-            emailService.sendEmailAlert(emailDetails);
+            emailService.sendHtmlMessageToVerifyEmail(emailDetails, user.getFirstName(),link);
             return ResponseEntity.ok().body("Verification email resent successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -63,7 +63,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testRegister() {
+    void testRegister() throws MessagingException, JsonProcessingException {
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setFirstName("John");
         registerRequest.setLastName("Doe");
