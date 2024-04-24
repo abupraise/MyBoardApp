@@ -6,7 +6,6 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.request.UpdateUserRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,9 +21,6 @@ public interface UserService {
     UserResponse editUser(Long id, UpdateUserRequest updateUserRequest);
     UserResponse viewUser(Long id);
     public String resetPassword(String email, String oldPassword, String newPassword);
-
-    String logout(HttpServletRequest request);
-
     public  ResponseEntity<?> forgotPasswordEmail(String email);
     public String verifyForgotPasswordEmail(String token) throws IOException;
     String forgotPassword(String email, String newPassword, String confirmPassword);

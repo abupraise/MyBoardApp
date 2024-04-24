@@ -26,7 +26,6 @@ public class AppUser extends BaseClass implements UserDetails {
     private String phoneNumber;
     private String password;
     private Boolean isEnabled;
-    private String token;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskList> taskList;

@@ -67,10 +67,6 @@ public class AuthController {
     public ResponseEntity<String> resetPassword(@RequestParam String email,  String oldPassword,@RequestHeader String newPassword){
         return new ResponseEntity<>(userService.resetPassword(email,oldPassword, newPassword), HttpStatus.OK);
     }
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request){
-        return ResponseEntity.status(HttpStatus.OK).body(userService.logout(request));
-    }
 
     @PostMapping("/forgot-password-email")
     public ResponseEntity<?> forgotPasswordEmail(@RequestParam String email){
