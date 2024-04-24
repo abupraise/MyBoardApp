@@ -1,5 +1,6 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.config;
 
+import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtTokenProvider;
+    private final UserRepository userRepository;
 
     private final UserDetailsService userDetailsService;
 
@@ -28,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
 
-        if(StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)){
+        if(StringUtils.hasText(token) && jwtTokenProvider.validateToken(token) && userRepository.existsByToken(token)){
             String username = jwtTokenProvider.getUserName(token);
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

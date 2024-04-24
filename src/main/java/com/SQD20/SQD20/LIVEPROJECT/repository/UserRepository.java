@@ -16,6 +16,7 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByEmail(String email);
     Boolean existsByEmail(String email);
 
+    Boolean existsByToken(String token);
     @Modifying
     @Transactional
     @Query("UPDATE AppUser user SET user.password = :newPassword WHERE user.email = :email")
