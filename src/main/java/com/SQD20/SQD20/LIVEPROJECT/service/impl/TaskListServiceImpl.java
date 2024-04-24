@@ -7,13 +7,11 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskListNotFoundExce
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.TaskNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UserNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskListRequest;
-import com.SQD20.SQD20.LIVEPROJECT.payload.request.TaskRequest;
-import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskResponse;
+import com.SQD20.SQD20.LIVEPROJECT.payload.response.TaskListResponse;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskListRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.TaskRepository;
 import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import com.SQD20.SQD20.LIVEPROJECT.service.TaskListService;
-import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.TaskListUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +47,7 @@ public class TaskListServiceImpl implements TaskListService {
     }
 
     @Override
-    public TaskResponse createTaskList(Long userId, TaskListRequest request) {
+    public TaskListResponse createTaskList(Long userId, TaskListRequest request) {
         AppUser user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User Not Found with ID : " + userId));
 
         TaskList newTaskList = new TaskList();
@@ -57,7 +56,7 @@ public class TaskListServiceImpl implements TaskListService {
         newTaskList.setUser(user);
 
         taskListRepository.save(newTaskList);
-        return TaskResponse.builder()
+        return TaskListResponse.builder()
                 .responseCode(TaskListUtils.TASK_LIST_CREATION_SUCCESS_CODE)
                 .responseMessage(TaskListUtils.TASK_LIST_CREATION_MESSAGE)
                 .title(newTaskList.getTitle())
@@ -78,5 +77,24 @@ public class TaskListServiceImpl implements TaskListService {
         }
         throw new TaskNotFoundException("Task not found");
     }
+
+    @Override
+    public List<TaskListResponse> getAllTaskList(Long userID) {
+        List<TaskList> taskLists = taskListRepository.findByUserId(userID);
+        if (taskLists.isEmpty()) {
+            throw new TaskListNotFoundException("No task lists found for user with ID: " + userID);
+        }
+        return taskLists.stream().map((taskList) -> mapToResponse(taskList)).collect(Collectors.toList());
+    }
+
+    TaskListResponse mapToResponse(TaskList task){
+        TaskListResponse response = TaskListResponse.builder()
+                .description(task.getDescription())
+                .title(task.getTitle())
+                .build();
+        return response;
+
+    }
+
 
 }

@@ -5,6 +5,7 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.request.UpdateUserRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
@@ -12,6 +13,8 @@ import com.SQD20.SQD20.LIVEPROJECT.repository.UserRepository;
 import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.mail.MessagingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,13 +23,14 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -46,6 +50,9 @@ class UserServiceImplTest {
 
     @Mock
     private EmailService emailService;
+
+    @Mock
+    UpdateUserRequest updateUserRequest;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -237,7 +244,7 @@ class UserServiceImplTest {
         when(userRepository.save(any(AppUser.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Testing editUser method
-        UserResponse editedUser = userService.editUser(userId, registerRequest);
+        UserResponse editedUser = userService.editUser(userId, updateUserRequest);
 
         // Assertions
         verify(userRepository).findById(userId);
@@ -247,7 +254,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserById() {
+    void testViewUser() {
         // Mocking data
         Long userId = 1L;
 
@@ -269,7 +276,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserById_UserNotFound() {
+    void testViewUser_UserNotFound() {
         // Mocking data
         Long userId = 1L;
 
@@ -287,6 +294,112 @@ class UserServiceImplTest {
         // Assertions
         verify(userRepository).findById(userId);
         // Add more assertions as needed
+    }
+
+
+    @Test
+    public void testForgotPasswordEmail_UserNotFound() {
+        String email = "nonexistent@example.com";
+        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = userService.forgotPasswordEmail(email);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("User with the provided email does not exist.", response.getBody());
+    }
+
+    @Test
+    public void testForgotPasswordEmail_EmailSentSuccessfully() throws MessagingException, JsonProcessingException {
+        String email = "existing@example.com";
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(jwtService.generateToken(user)).thenReturn("token");
+
+        ResponseEntity<?> response = userService.forgotPasswordEmail(email);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Password reset email sent successfully.", response.getBody());
+        // Verify that emailService.sendHtmlMessageForResetPassword was called with correct arguments
+        verify(emailService).sendHtmlMessageForResetPassword(any(), eq(user.getFirstName()), any());
+    }
+
+    // Write similar tests for other scenarios of forgotPasswordEmail
+
+    @Test
+    public void testVerifyForgotPasswordEmail_UserNotFound() throws IOException {
+        String token = "invalidToken";
+        when(jwtService.getUserName(token)).thenReturn("nonexistent@example.com");
+        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
+
+        String result = userService.verifyForgotPasswordEmail(token);
+
+        assertEquals("User does not exist", result);
+    }
+
+    // Write similar tests for other scenarios of verifyForgotPasswordEmail
+
+    @Test
+    public void testForgotPassword_PasswordResetSuccessfully() {
+        String email = "existing@example.com";
+        String newPassword = "newPassword";
+        String confirmPassword = "newPassword";
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(newPassword)).thenReturn("encryptedPassword");
+
+        String result = userService.forgotPassword(email, newPassword, confirmPassword);
+
+        assertEquals("Password reset successfully. You can now login with your new password.", result);
+        // Verify that userRepository.updateUserPassword was called with correct arguments
+        verify(userRepository).updateUserPassword(eq(email), eq("encryptedPassword"));
+    }
+
+    @Test
+    public void testForgotPassword_PasswordsDoNotMatch() {
+        String email = "existing@example.com";
+        String newPassword = "newPassword";
+        String confirmPassword = "differentPassword";
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        String result = userService.forgotPassword(email, newPassword, confirmPassword);
+
+        assertEquals("New password and confirm password do not match.", result);
+        // Verify that userRepository.updateUserPassword was not called
+        verify(userRepository, never()).updateUserPassword(anyString(), anyString());
+    }
+
+
+    @Test
+    void loadUserByUsername_UserFound_ReturnsUserDetails() {
+
+        String email = "test@example.com";
+        String password = "password";
+        boolean isEnabled = true;
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setIsEnabled(isEnabled);
+
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+        UserDetails userDetails = userService.loadUserByUsername(email);
+
+        assertNotNull(userDetails);
+        assertEquals(email, userDetails.getUsername());
+        assertEquals(password, userDetails.getPassword());
+        assertTrue(userDetails.isEnabled());
+    }
+
+    @Test
+    void loadUserByUsername_UserNotFound_ThrowsException() {
+
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("nonexistent@example.com"));
     }
 
 }

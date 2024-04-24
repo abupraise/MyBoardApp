@@ -198,6 +198,43 @@ public class TaskServiceImplTest {
     }
 
     @Test
+    void updateTaskStatus_taskExists_statusUpdated() {
+        // Arrange
+        Long taskId = 1L;
+        TaskRequest taskRequest = new TaskRequest();
+        taskRequest.setStatus(Status.COMPLETED);
+
+        Task existingTask = new Task();
+        existingTask.setId(taskId);
+        existingTask.setStatus(Status.PENDING);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
+
+        // Act
+        taskService.updateTaskStatus(taskId, taskRequest);
+
+        // Assert
+        verify(taskRepository, times(1)).findById(taskId);
+        verify(taskRepository, times(1)).save(existingTask);
+        assert(existingTask.getStatus()).equals(Status.COMPLETED);
+    }
+
+    @Test
+    void updateTaskStatus_taskNotFound_throwException() {
+        // Arrange
+        Long taskId = 1L;
+        TaskRequest taskRequest = new TaskRequest();
+        taskRequest.setStatus(Status.COMPLETED);
+
+        when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(TaskNotFoundException.class, () -> {
+            taskService.updateTaskStatus(taskId, taskRequest);
+        });
+    }
+
+    @Test
     void getTasksByTaskListId_ShouldReturnListOfTasksResponse() {
         // Arrange
         Long taskListId = 1L;
@@ -216,4 +253,5 @@ public class TaskServiceImplTest {
         assertEquals(results.get(0).getTitle(), null);
         assertEquals(results.get(1).getTitle(), null);
     }
+
 }
