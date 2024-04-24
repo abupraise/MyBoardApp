@@ -31,7 +31,9 @@ with other productivity tools.
 
 ### ENTITY RELATIONSHIP DIAGRAM
 
-![Entity Relationship Diagram](/Users/decagon/Downloads/erd.png)
+![Entity Relationship Diagram](/Users/decagon/Desktop/myboard_backend/src/main/resources/erd.png)
+
+
 
 ### USER INTERFACE (UI) DESIGN
 - Intuitive Design: User-friendly interface for easy navigation.
