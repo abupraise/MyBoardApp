@@ -6,6 +6,8 @@ import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Validated
-            @RequestBody RegisterRequest registerRequest, BindingResult bindingResult){
+            @RequestBody RegisterRequest registerRequest, BindingResult bindingResult) throws MessagingException, JsonProcessingException {
 
         if (bindingResult.hasErrors()) {
             // Construct error response with specific error messages for each field
