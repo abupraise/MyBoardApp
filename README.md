@@ -31,7 +31,7 @@ with other productivity tools.
 
 ### ENTITY RELATIONSHIP DIAGRAM
 
-![Entity Relationship Diagram](src/main/resources/erd.png)
+![Entity Relationship Diagram](/Users/decagon/Desktop/myboard_backend/src/main/resources/erd.png)
 
 
 
