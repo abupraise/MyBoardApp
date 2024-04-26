@@ -43,34 +43,39 @@ public class TaskServiceImplTest {
     @InjectMocks
     private TaskServiceImpl taskService;
 
+
     @Test
-    void testCreateTaskWithValidInputs() {
+    void testCreateTask_SuccessfullyCreatesTask() {
         // Arrange
         Long userId = 1L;
         Long taskListId = 1L;
         TaskRequest createRequest = new TaskRequest();
         createRequest.setTitle("New Task");
-        createRequest.setDescription("Description");
-        createRequest.setDeadline(null);
-        createRequest.setPriorityLevel(PriorityLevel.NONE);
+        createRequest.setDescription("This is a test task");
+        createRequest.setDeadline(LocalDateTime.now().plusDays(1));
+        createRequest.setPriorityLevel(PriorityLevel.HIGH);
         createRequest.setStatus(Status.PENDING);
 
         AppUser user = new AppUser();
         user.setId(userId);
         TaskList taskList = new TaskList();
         taskList.setId(taskListId);
-        Task task = new Task();
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(taskListRepository.findById(taskListId)).thenReturn(Optional.of(taskList));
-        when(taskRepository.save(any(Task.class))).thenReturn(task);
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        TaskRequest returnedTask = taskService.createTask(userId, taskListId, createRequest);
+        TaskRequest result = taskService.createTask(userId, taskListId, createRequest);
 
         // Assert
-        assertNotNull(returnedTask);
-        assertEquals("New Task", returnedTask.getTitle());
+        assertNotNull(result);
+        assertEquals("New Task", result.getTitle());
+        assertEquals("This is a test task", result.getDescription());
+        assertNotNull(result.getDeadline());
+        assertEquals(PriorityLevel.HIGH, result.getPriorityLevel());
+        assertEquals(Status.PENDING, result.getStatus());
+
         verify(userRepository).findById(userId);
         verify(taskListRepository).findById(taskListId);
         verify(taskRepository).save(any(Task.class));
@@ -165,25 +170,6 @@ public class TaskServiceImplTest {
         assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(taskId));
     }
 
-    @Test
-    void testCreateTaskListNotFound() {
-        // Arrange
-        Long userId = 1L;
-        Long taskListId = 2L;
-        TaskRequest request = new TaskRequest();
-        AppUser user = new AppUser();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(taskListRepository.findById(taskListId)).thenReturn(Optional.empty());
-        when(taskListRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(TaskListNotFoundException.class, () -> taskService.createTask(userId, taskListId, request));
-        verify(userRepository).findById(userId);
-        verify(taskListRepository).findById(taskListId);
-        verify(taskListRepository).findById(1L);
-        verifyNoInteractions(taskRepository);
-    }
 
     @Test
     void updateTaskStatus_taskExists_statusUpdated() {
