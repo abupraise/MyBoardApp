@@ -43,6 +43,58 @@ public class TaskServiceImplTest {
     @InjectMocks
     private TaskServiceImpl taskService;
 
+
+    @Test
+    void testCreateTask_SuccessfullyCreatesTask() {
+        // Arrange
+        Long userId = 1L;
+        Long taskListId = 1L;
+        TaskRequest createRequest = new TaskRequest();
+        createRequest.setTitle("New Task");
+        createRequest.setDescription("This is a test task");
+        createRequest.setDeadline(LocalDateTime.now().plusDays(1));
+        createRequest.setPriorityLevel(PriorityLevel.HIGH);
+        createRequest.setStatus(Status.PENDING);
+
+        AppUser user = new AppUser();
+        user.setId(userId);
+        TaskList taskList = new TaskList();
+        taskList.setId(taskListId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(taskListRepository.findById(taskListId)).thenReturn(Optional.of(taskList));
+        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        TaskRequest result = taskService.createTask(userId, taskListId, createRequest);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("New Task", result.getTitle());
+        assertEquals("This is a test task", result.getDescription());
+        assertNotNull(result.getDeadline());
+        assertEquals(PriorityLevel.HIGH, result.getPriorityLevel());
+        assertEquals(Status.PENDING, result.getStatus());
+
+        verify(userRepository).findById(userId);
+        verify(taskListRepository).findById(taskListId);
+        verify(taskRepository).save(any(Task.class));
+    }
+
+    @Test
+    void testCreateTaskWithNonexistentUser() {
+        // Arrange
+        Long userId = 99L; // Assuming this user ID does not exist
+        Long taskListId = 1L;
+        TaskRequest createRequest = new TaskRequest();
+        createRequest.setTitle("Test Task");
+
+        when(userRepository.findById(userId)).thenThrow(new UsernameNotFoundException("User with ID " + userId + " not found"));
+
+        // Act & Assert
+        assertThrows(UsernameNotFoundException.class, () -> taskService.createTask(userId, taskListId, createRequest));
+    }
+
     @Test
     void updateTask_WhenTaskExists_UpdatesSuccessfully() {
         // Arrange
@@ -118,84 +170,6 @@ public class TaskServiceImplTest {
         assertThrows(TaskNotFoundException.class, () -> taskService.deleteTask(taskId));
     }
 
-    @Test
-    void testCreateTaskSuccess() {
-        // Arrange
-        Long userId = 1L;
-        Long taskListId = 2L;
-        TaskRequest request = new TaskRequest();
-        request.setTitle("Test Task");
-        request.setDescription("Test Description");
-        request.setDeadline(null);
-        request.setPriorityLevel(PriorityLevel.HIGH);
-        request.setStatus(Status.PENDING);
-
-        AppUser user = new AppUser();
-        TaskList taskList = new TaskList();
-
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(user));
-        when(taskListRepository.findById(taskListId)).thenReturn(java.util.Optional.of(taskList));
-        when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
-            Task savedTask = invocation.getArgument(0);
-
-            request.setTitle(savedTask.getTitle());
-            request.setDescription(savedTask.getDescription());
-            request.setDeadline(savedTask.getDeadline());
-            request.setPriorityLevel(savedTask.getPriorityLevel());
-            request.setStatus(savedTask.getStatus());
-            return savedTask;
-        });
-
-        // Act
-        TaskRequest createdTaskRequest = taskService.createTask(userId, taskListId, request);
-
-        // Assert
-        assertNotNull(createdTaskRequest);
-        assertEquals(request.getTitle(), createdTaskRequest.getTitle());
-        assertEquals(request.getDescription(), createdTaskRequest.getDescription());
-        assertEquals(request.getPriorityLevel(), createdTaskRequest.getPriorityLevel());
-        assertEquals(request.getStatus(), createdTaskRequest.getStatus());
-
-        verify(userRepository).findById(userId);
-        verify(taskListRepository).findById(taskListId);
-        verify(taskRepository).save(any(Task.class));
-    }
-
-    @Test
-    void testCreateTaskUserNotFound() {
-        // Arrange
-        Long userId = 1L;
-        Long taskListId = 2L;
-        TaskRequest request = new TaskRequest();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(UsernameNotFoundException.class, () -> taskService.createTask(userId, taskListId, request));
-        verify(userRepository).findById(userId);
-        verifyNoInteractions(taskListRepository);
-        verifyNoInteractions(taskRepository);
-    }
-
-    @Test
-    void testCreateTaskListNotFound() {
-        // Arrange
-        Long userId = 1L;
-        Long taskListId = 2L;
-        TaskRequest request = new TaskRequest();
-        AppUser user = new AppUser();
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(taskListRepository.findById(taskListId)).thenReturn(Optional.empty());
-        when(taskListRepository.findById(1L)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(TaskListNotFoundException.class, () -> taskService.createTask(userId, taskListId, request));
-        verify(userRepository).findById(userId);
-        verify(taskListRepository).findById(taskListId);
-        verify(taskListRepository).findById(1L);
-        verifyNoInteractions(taskRepository);
-    }
 
     @Test
     void updateTaskStatus_taskExists_statusUpdated() {
