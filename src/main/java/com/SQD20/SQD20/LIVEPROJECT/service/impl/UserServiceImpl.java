@@ -136,9 +136,11 @@ public class UserServiceImpl implements UserService {
         AppUser user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
+                .id(user.getId())
                 .responseCode(UserUtils.LOGIN_SUCCESS_CODE)
                 .responseMessage(UserUtils.LOGIN_SUCCESS_MESSAGE)
                 .email(user.getEmail())
+                .firstName(user.getFirstName())
                 .accessToken(jwtToken)
                 .build();
     }

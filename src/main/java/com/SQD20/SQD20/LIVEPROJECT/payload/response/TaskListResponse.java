@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class TaskListResponse {
+    private Long id;
     private String responseCode;
     private String responseMessage;
     private String title;

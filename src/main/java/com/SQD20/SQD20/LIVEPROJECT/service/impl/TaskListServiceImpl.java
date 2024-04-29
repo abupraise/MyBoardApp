@@ -89,6 +89,7 @@ public class TaskListServiceImpl implements TaskListService {
 
     TaskListResponse mapToResponse(TaskList task){
         TaskListResponse response = TaskListResponse.builder()
+                .id(task.getId())
                 .description(task.getDescription())
                 .title(task.getTitle())
                 .build();
