@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        /* Reset CSS */
+        body, h1, p {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Email wrapper */
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Media Queries */
+        @media screen and (max-width: 600px) {
+            .email-wrapper {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-wrapper">
+    <!-- Header -->
+    <div class="header">
+        <h1>Email Verification</h1>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <p>Hello <th:block th:text="${name}"></th:block>,</p>
+        <p>Welcome to MyBoard! Your number one Task manager! Click the button below to verify your email address:</p>
+        <a href="#" th:href="${link}" class="btn">Verify Email</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>This email was sent from <b>myBoard</b>.</p>
+    </div>
+</div>
+</body>
+</html>

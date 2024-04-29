@@ -24,6 +24,7 @@ public class AppUser extends BaseClass implements UserDetails {
     @Email
     private String email;
     private String phoneNumber;
+    private String profilePicture;
     private String password;
     private Boolean isEnabled;
     private String token;

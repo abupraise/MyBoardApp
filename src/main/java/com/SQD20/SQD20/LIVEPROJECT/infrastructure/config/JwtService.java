@@ -70,4 +70,16 @@ public class JwtService {
             throw new RuntimeException(e);
         }
     }
+
+    public String extractUsernameFromToken(String token) {
+
+        String jwtToken = token.replace("Bearer ", "");
+
+        return Jwts.parser()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(jwtToken)
+                .getBody()
+                .getSubject();
+    }
 }

@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtAuthenticationFilter;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.InvalidAccessException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.PasswordNotFoundException;
@@ -8,6 +9,7 @@ import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundExce
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.EmailDetails;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
+import com.SQD20.SQD20.LIVEPROJECT.payload.request.UpdateUserRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.RegisterResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.AuthenticationResponse;
 import com.SQD20.SQD20.LIVEPROJECT.payload.response.UserResponse;
@@ -16,10 +18,15 @@ import com.SQD20.SQD20.LIVEPROJECT.service.EmailService;
 import com.SQD20.SQD20.LIVEPROJECT.service.UserService;
 import com.SQD20.SQD20.LIVEPROJECT.utils.EmailTemplate;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,13 +35,20 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 @Service
 @RequiredArgsConstructor
@@ -49,9 +63,18 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final FileUploadServiceImpl fileUploadService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final HttpServletRequest request;
+
+    private  final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    @Autowired
+    private  HttpServletResponse response;
+
+    private final Set<String> invalidatedTokens = ConcurrentHashMap.newKeySet();
 
     @Override
-    public RegisterResponse register(@Valid RegisterRequest registerRequest) {
+    public RegisterResponse register(@Valid RegisterRequest registerRequest) throws MessagingException, JsonProcessingException {
 
         // Validate email format
         String emailRegex = "^(.+)@(.+)$";
@@ -96,14 +119,14 @@ public class UserServiceImpl implements UserService {
 
 
         String jwtToken = jwtService.generateToken(newUser);
-
+        String link = EmailTemplate.getVerificationUrl(baseUrl, jwtToken);
         EmailDetails emailDetails = EmailDetails.builder()
                 .recipient(savedUser.getEmail())
                 .subject("ACCOUNT VERIFICATION")
                 .messageBody(EmailTemplate.getEmailMessage(savedUser.getFirstName(), baseUrl, jwtToken))
                 .build();
 
-        emailService.sendEmailAlert(emailDetails);
+        emailService.sendHtmlMessageToVerifyEmail(emailDetails, newUser.getFirstName(), link);
         return RegisterResponse.builder()
                 .responseCode(UserUtils.ACCOUNT_CREATION_SUCCESS_CODE)
                 .responseMessage(UserUtils.ACCOUNT_CREATION_SUCCESS_MESSAGE)
@@ -124,7 +147,6 @@ public class UserServiceImpl implements UserService {
         AppUser user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         user.setToken(jwtToken);
-        userRepository.save(user);
         return AuthenticationResponse.builder()
                 .responseCode(UserUtils.LOGIN_SUCCESS_CODE)
                 .responseMessage(UserUtils.LOGIN_SUCCESS_MESSAGE)
@@ -173,6 +195,7 @@ public class UserServiceImpl implements UserService {
 
         // Generate a new verification token
         String jwtToken = jwtService.generateToken(user);
+        String link = EmailTemplate.getVerificationUrl(baseUrl,jwtToken);
 
         // Send the verification email
         EmailDetails emailDetails = EmailDetails.builder()
@@ -182,7 +205,7 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         try {
-            emailService.sendEmailAlert(emailDetails);
+            emailService.sendHtmlMessageToVerifyEmail(emailDetails, user.getFirstName(),link);
             return ResponseEntity.ok().body("Verification email resent successfully.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -191,12 +214,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse editUser(Long id, RegisterRequest registerRequest) {
+    public UserResponse editUser(Long id, UpdateUserRequest updateUserRequest) {
         AppUser appUser = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("No User associated with " + id));
-        appUser.setFirstName(registerRequest.getFirstName());
-        appUser.setLastName(registerRequest.getLastName());
-        appUser.setPhoneNumber(registerRequest.getPhoneNumber());
+        appUser.setFirstName(updateUserRequest.getFirstName());
+        appUser.setLastName(updateUserRequest.getLastName());
+        appUser.setPhoneNumber(updateUserRequest.getPhoneNumber());
         userRepository.save(appUser);
         return UserResponse.builder()
                 .responseMessage(UserUtils.USER_UPDATE_MESSAGE)
@@ -234,24 +257,136 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String logout(HttpServletRequest request) {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-       Authentication authentication = securityContext.getAuthentication();
-       if (authentication != null){
-           String email = authentication.getName();
-           Optional<AppUser> appUser = userRepository.findByEmail(email);
-           if(appUser.isPresent()){
-               AppUser existingUser = appUser.get();
-               existingUser.setToken(null);
-               userRepository.save(existingUser);
-               securityContext.setAuthentication(null);
-               SecurityContextHolder.clearContext();
-               return "logout success";
-           }else {
-               throw new InvalidAccessException("Invalid User");
-           }
+    public ResponseEntity<?> forgotPasswordEmail(String email) {
+            Optional<AppUser> optionalAppUser = userRepository.findByEmail(email);
+            if (optionalAppUser.isEmpty()) {
+                return ResponseEntity.badRequest().body("User with the provided email does not exist.");
+            }
+            AppUser user = optionalAppUser.get();
+            try {
+                String resetToken = jwtService.generateToken(user);
+                String link = EmailTemplate.getForgotPasswordVerificationUrl(baseUrl, resetToken);
+                EmailDetails emailDetails = EmailDetails.builder()
+                        .recipient(user.getEmail())
+                        .subject("Reset Your Password")
+                        .messageBody(EmailTemplate.getEmailMessage(user.getFirstName(), baseUrl, resetToken))
+                        .build();
+                //emailService.sendEmailAlert(emailDetails);
+                emailService.sendHtmlMessageForResetPassword(emailDetails,user.getFirstName(),link);
+                return ResponseEntity.ok().body("Password reset email sent successfully.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to send password reset email. Please try again later.");
+            }
+        }
 
-       }
+    @Override
+    public String verifyForgotPasswordEmail(String token) throws IOException {
+        String username = jwtService.getUserName(token);
+        if (username != null) {
+            Optional<AppUser> userOptional = userRepository.findByEmail(username);
+            if (userOptional.isPresent()) {
+                AppUser user = userOptional.get();
+                // Check if the token is valid for resetting the password
+                if (jwtService.validateToken(token)) {
+                    // If the token is valid, return appropriate message
+                    response.sendRedirect("https://www.google.com");
+                    return "Email Verified for Password Reset";
+                } else {
+                    // If the token is invalid, return appropriate message
+                    return "Invalid or Expired Token";
+                }
+            } else {
+                // If the user does not exist, return appropriate message
+                return "User does not exist";
+            }
+        } else {
+            return "Invalid Token or Broken Link";
+        }
+    }
+
+
+
+    @Override
+    public String forgotPassword(String email, String newPassword, String confirmPassword) {
+        Optional<AppUser> optionalAppUser = userRepository.findByEmail(email);
+        if (optionalAppUser.isEmpty()) {
+            return "User with the provided email does not exist.";
+        }
+        AppUser user = optionalAppUser.get();
+        if (!newPassword.equals(confirmPassword)) {
+            return "New password and confirm password do not match.";
+        }
+        String encryptedPassword = passwordEncoder.encode(newPassword);
+        userRepository.updateUserPassword(user.getEmail(), encryptedPassword);
+        return "Password reset successfully. You can now login with your new password.";
+    }
+
+    public UserDetails loadUserByUsername(String username) {
+
+        Optional<AppUser> optionalUser = userRepository.findByEmail(username);
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        AppUser user = optionalUser.get();
+
+        return User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .accountExpired(!user.isAccountNonExpired())
+                .accountLocked(!user.isAccountNonLocked())
+                .credentialsExpired(!user.isCredentialsNonExpired())
+                .disabled(!user.isEnabled())
+                .build();
+    }
+
+    @Override
+    public ResponseEntity<UserResponse<String>> uploadProfilePicture(MultipartFile profilePics) {
+        String token = jwtAuthenticationFilter.getTokenFromRequest(request);
+        String email = jwtService.getUserName(token);
+
+        Optional<AppUser> userOptional = userRepository.findByEmail(email);
+        String file_url = "";
+
+        try {
+            if (userOptional.isPresent()){
+                file_url = fileUploadService.uploadFile(profilePics);
+
+                AppUser user = userOptional.get();
+                user.setProfilePicture(file_url);
+
+                userRepository.save(user);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(
+                new UserResponse<>(
+                        "Uploaded Successfully",
+                        file_url != null ? file_url : ""
+                )
+        );
+    }
+
+    public String logout() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication != null){
+            String email = authentication.getName();
+            Optional<AppUser> appUser = userRepository.findByEmail(email);
+            if(appUser.isPresent()){
+                AppUser existingUser = appUser.get();
+                existingUser.setToken(null);
+                userRepository.save(existingUser);
+                securityContext.setAuthentication(null);
+                SecurityContextHolder.clearContext();
+                return "logout successfully";
+            }else {
+                throw new InvalidAccessException("Invalid User");
+            }
+
+        }
         throw new InvalidAccessException("Invalid access");
     }
 }
