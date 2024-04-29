@@ -11,6 +11,7 @@ import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -27,4 +28,5 @@ public interface UserService {
     public String verifyForgotPasswordEmail(String token) throws IOException;
     String forgotPassword(String email, String newPassword, String confirmPassword);
     public UserDetails loadUserByUsername(String username);
+    public ResponseEntity<UserResponse<String>> uploadProfilePicture(MultipartFile profilePics);
 }

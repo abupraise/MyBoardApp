@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtAuthenticationFilter;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
@@ -15,6 +16,7 @@ import com.SQD20.SQD20.LIVEPROJECT.service.impl.UserServiceImpl;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -35,12 +38,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class UserServiceImplTest {
-
     @Mock
     private JwtService jwtService;
 
     @Mock
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
+
+    @Mock
+    private FileUploadServiceImpl fileUploadService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -57,10 +69,12 @@ class UserServiceImplTest {
     @InjectMocks
     private UserServiceImpl userService;
 
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
 
     @Test
     void testRegister() throws MessagingException, JsonProcessingException {
@@ -400,6 +414,53 @@ class UserServiceImplTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("nonexistent@example.com"));
+    }
+
+    @Test
+    void uploadProfilePicture_Success() throws IOException {
+        String token = "dummyToken";
+        String email = "test@example.com";
+        MultipartFile profilePicture = mock(MultipartFile.class);
+        AppUser appUser = new AppUser();
+        String fileUrl = "http://example.com/image.jpg";
+
+        when(jwtAuthenticationFilter.getTokenFromRequest(httpServletRequest)).thenReturn(token);
+        when(jwtService.getUserName(token)).thenReturn(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(appUser));
+        when(fileUploadService.uploadFile(profilePicture)).thenReturn(fileUrl);
+
+
+        ResponseEntity<UserResponse<String>> response = userService.uploadProfilePicture(profilePicture);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Uploaded Successfully", response.getBody().getResponseMessage());
+        assertEquals(fileUrl, response.getBody().getData());
+        verify(userRepository, times(1)).save(appUser);
+    }
+
+    @Test
+    void uploadProfilePicture_FileUploadFailure() {
+        String token = "dummyToken";
+        String email = "test@example.com";
+        MultipartFile profilePicture = mock(MultipartFile.class);
+
+        when(jwtAuthenticationFilter.getTokenFromRequest(httpServletRequest)).thenReturn(token);
+        when(jwtService.getUserName(token)).thenReturn(email);
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(new AppUser()));
+        try {
+            when(fileUploadService.uploadFile(profilePicture)).thenThrow(IOException.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        ResponseEntity<UserResponse<String>> response = null;
+        try {
+            response = userService.uploadProfilePicture(profilePicture);
+        } catch (RuntimeException e) {
+
+        }
+
+        assertEquals(null, response);
     }
 
 }
