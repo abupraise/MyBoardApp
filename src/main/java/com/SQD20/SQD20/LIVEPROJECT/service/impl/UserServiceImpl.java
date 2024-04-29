@@ -1,6 +1,7 @@
 package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtAuthenticationFilter;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.PasswordNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
@@ -18,6 +19,7 @@ import com.SQD20.SQD20.LIVEPROJECT.utils.EmailTemplate;
 import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,6 +59,10 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final FileUploadServiceImpl fileUploadService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final HttpServletRequest request;
+
     private  final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private  HttpServletResponse response;
@@ -327,5 +334,33 @@ public class UserServiceImpl implements UserService {
                 .credentialsExpired(!user.isCredentialsNonExpired())
                 .disabled(!user.isEnabled())
                 .build();
+    }
+
+    @Override
+    public ResponseEntity<UserResponse<String>> uploadProfilePicture(MultipartFile profilePics) {
+        String token = jwtAuthenticationFilter.getTokenFromRequest(request);
+        String email = jwtService.getUserName(token);
+
+        Optional<AppUser> userOptional = userRepository.findByEmail(email);
+        String file_url = "";
+
+        try {
+            if (userOptional.isPresent()){
+                file_url = fileUploadService.uploadFile(profilePics);
+
+                AppUser user = userOptional.get();
+                user.setProfilePicture(file_url);
+
+                userRepository.save(user);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(
+                new UserResponse<>(
+                        "Uploaded Successfully",
+                        file_url != null ? file_url : ""
+                )
+        );
     }
 }
