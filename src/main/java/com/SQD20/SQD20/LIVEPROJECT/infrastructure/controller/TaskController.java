@@ -55,4 +55,13 @@ public class TaskController  {
         }
         return ResponseEntity.ok(taskResponses);
     }
+
+    @GetMapping("/all-tasks/{userId}")
+    public ResponseEntity<List<TasksResponse>> getAllTasks(@PathVariable("userId") Long userId) {
+        List<TasksResponse> taskResponses = taskService.getAllTasks(userId);
+        if (taskResponses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(taskResponses);
+    }
 }
