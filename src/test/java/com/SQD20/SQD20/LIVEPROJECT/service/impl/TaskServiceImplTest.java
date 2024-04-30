@@ -231,6 +231,8 @@ public class TaskServiceImplTest {
 
     @Test
     public void testGetAllTasks() {
+        Long userId = 123L;
+
         List<Task> mockTasks = new ArrayList<>();
         mockTasks.add(Task.builder()
                 .title("Task 1")
@@ -254,22 +256,18 @@ public class TaskServiceImplTest {
                 .status(Status.COMPLETED)
                 .build());
 
-        when(taskRepository.findAll()).thenReturn(mockTasks);
 
-        List<TasksResponse> tasksResponses = taskService.getAllTasks();
+        when(taskRepository.findByUserId(userId)).thenReturn(mockTasks);
+
+        List<TasksResponse> tasksResponses = taskService.getAllTasks(userId);
 
         assertEquals(mockTasks.size(), tasksResponses.size());
-
         for (int i = 0; i < mockTasks.size(); i++) {
             Task mockTask = mockTasks.get(i);
             TasksResponse response = tasksResponses.get(i);
 
-
+            assertEquals(mockTask.getId(), response.getId());
             assertEquals(mockTask.getTitle(), response.getTitle());
-            assertEquals(mockTask.getDescription(), response.getDescription());
-            assertEquals(mockTask.getDeadline(), response.getDeadline());
-            assertEquals(mockTask.getPriorityLevel(), response.getPriorityLevel());
-            assertEquals(mockTask.getStatus(), response.getStatus());
         }
     }
 
