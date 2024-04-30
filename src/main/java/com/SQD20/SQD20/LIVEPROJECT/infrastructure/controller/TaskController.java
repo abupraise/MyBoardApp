@@ -55,4 +55,13 @@ public class TaskController  {
         }
         return ResponseEntity.ok(taskResponses);
     }
+
+    @GetMapping("/all-tasks")
+    public ResponseEntity<List<TasksResponse>> getAllTasks() {
+        List<TasksResponse> taskResponses = taskService.getAllTasks();
+        if (taskResponses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(taskResponses);
+    }
 }

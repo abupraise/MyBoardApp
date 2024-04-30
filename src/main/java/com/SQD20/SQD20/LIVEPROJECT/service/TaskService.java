@@ -15,4 +15,5 @@ public interface TaskService {
     public TaskRequest createTask(Long userId, Long taskListId, TaskRequest createRequest);
     public Task updateTaskStatus(Long taskId, TaskRequest taskStatus);
     public List<TasksResponse> getTasksByTaskListId(Long taskListId);
+    public List<TasksResponse> getAllTasks();
 }

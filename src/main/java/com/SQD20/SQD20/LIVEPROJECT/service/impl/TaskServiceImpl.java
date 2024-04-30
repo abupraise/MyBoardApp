@@ -100,6 +100,14 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<TasksResponse> getAllTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream()
+                .map(this::convertToTaskResponse)
+                .collect(Collectors.toList());
+    }
+
     private TasksResponse convertToTaskResponse(Task task) {
         return new TasksResponse(
                 task.getId(),

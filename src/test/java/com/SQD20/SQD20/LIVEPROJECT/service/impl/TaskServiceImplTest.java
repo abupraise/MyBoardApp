@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -226,6 +227,50 @@ public class TaskServiceImplTest {
         verify(taskRepository).findByTaskListId(taskListId);
         assertEquals(results.get(0).getTitle(), null);
         assertEquals(results.get(1).getTitle(), null);
+    }
+
+    @Test
+    public void testGetAllTasks() {
+        List<Task> mockTasks = new ArrayList<>();
+        mockTasks.add(Task.builder()
+                .title("Task 1")
+                .description("Description for Task 1")
+                .deadline(LocalDateTime.of(2024, 5, 1, 12, 0))
+                .priorityLevel(PriorityLevel.HIGH)
+                .status(Status.PENDING)
+                .build());
+        mockTasks.add(Task.builder()
+                .title("Task 2")
+                .description("Description for Task 2")
+                .deadline(LocalDateTime.of(2024, 5, 2, 15, 30))
+                .priorityLevel(PriorityLevel.MEDIUM)
+                .status(Status.IN_PROGRESS)
+                .build());
+        mockTasks.add(Task.builder()
+                .title("Task 3")
+                .description("Description for Task 3")
+                .deadline(LocalDateTime.of(2024, 5, 3, 10, 0))
+                .priorityLevel(PriorityLevel.LOW)
+                .status(Status.COMPLETED)
+                .build());
+
+        when(taskRepository.findAll()).thenReturn(mockTasks);
+
+        List<TasksResponse> tasksResponses = taskService.getAllTasks();
+
+        assertEquals(mockTasks.size(), tasksResponses.size());
+
+        for (int i = 0; i < mockTasks.size(); i++) {
+            Task mockTask = mockTasks.get(i);
+            TasksResponse response = tasksResponses.get(i);
+
+
+            assertEquals(mockTask.getTitle(), response.getTitle());
+            assertEquals(mockTask.getDescription(), response.getDescription());
+            assertEquals(mockTask.getDeadline(), response.getDeadline());
+            assertEquals(mockTask.getPriorityLevel(), response.getPriorityLevel());
+            assertEquals(mockTask.getStatus(), response.getStatus());
+        }
     }
 
 }
