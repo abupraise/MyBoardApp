@@ -17,6 +17,7 @@ import com.SQD20.SQD20.LIVEPROJECT.utils.UserUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -25,6 +26,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
@@ -462,5 +466,29 @@ class UserServiceImplTest {
 
         assertEquals(null, response);
     }
+    @Test
+    public void testLogout() {
+        SecurityContext securityContext = mock(SecurityContext.class);
+        SecurityContextHolder.setContext(securityContext);
 
+        Authentication authentication = mock(Authentication.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        String userEmail = "test@example.com";
+        AppUser appUser = new AppUser();
+        appUser.setEmail(userEmail);
+        when(authentication.getName()).thenReturn(userEmail);
+        Optional<AppUser> optionalAppUser = Optional.of(appUser);
+        when(userRepository.findByEmail(userEmail)).thenReturn(optionalAppUser);
+
+
+       String result = userService.logout();
+
+        verify(userRepository).findByEmail(userEmail);
+        verify(userRepository).save(appUser);
+        verify(securityContext).setAuthentication(null);
+       // verify(SecurityContextHolder.clearContext();).clearContext();
+
+        assertEquals("logout successfully", result);
+    }
 }
