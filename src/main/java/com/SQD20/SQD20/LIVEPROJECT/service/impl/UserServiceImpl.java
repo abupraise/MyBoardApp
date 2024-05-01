@@ -3,6 +3,7 @@ package com.SQD20.SQD20.LIVEPROJECT.service.impl;
 import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtAuthenticationFilter;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
+import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.InvalidAccessException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.PasswordNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.exception.UsernameNotFoundException;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
@@ -31,6 +32,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -142,6 +146,7 @@ public class UserServiceImpl implements UserService {
 
         AppUser user = userRepository.findByEmail(request.getEmail()).orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+        user.setToken(jwtToken);
         return AuthenticationResponse.builder()
                 .id(user.getId())
                 .responseCode(UserUtils.LOGIN_SUCCESS_CODE)
@@ -364,5 +369,26 @@ public class UserServiceImpl implements UserService {
                         file_url != null ? file_url : ""
                 )
         );
+    }
+
+    public String logout() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication != null){
+            String email = authentication.getName();
+            Optional<AppUser> appUser = userRepository.findByEmail(email);
+            if(appUser.isPresent()){
+                AppUser existingUser = appUser.get();
+                existingUser.setToken(null);
+                userRepository.save(existingUser);
+                securityContext.setAuthentication(null);
+                SecurityContextHolder.clearContext();
+                return "logout successfully";
+            }else {
+                throw new InvalidAccessException("Invalid User");
+            }
+
+        }
+        throw new InvalidAccessException("Invalid access");
     }
 }

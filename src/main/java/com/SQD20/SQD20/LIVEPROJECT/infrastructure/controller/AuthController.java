@@ -1,5 +1,6 @@
 package com.SQD20.SQD20.LIVEPROJECT.infrastructure.controller;
 
+import com.SQD20.SQD20.LIVEPROJECT.domain.entites.AppUser;
 import com.SQD20.SQD20.LIVEPROJECT.infrastructure.config.JwtService;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.AuthenticationRequest;
 import com.SQD20.SQD20.LIVEPROJECT.payload.request.RegisterRequest;
@@ -12,6 +13,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -22,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -99,6 +103,11 @@ public class AuthController {
 
         return ResponseEntity.ok(newAccessToken);
     }
+    @PostMapping("/logout")
+    public String logout() {
+       return userService.logout();
+    }
+
 
 
 }

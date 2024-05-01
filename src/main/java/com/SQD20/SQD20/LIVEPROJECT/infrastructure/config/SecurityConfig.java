@@ -5,11 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -33,6 +31,9 @@ public class SecurityConfig {
         //api/v1/auth/verify-forgot-password-email
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer->{
+                    AbstractHttpConfigurer.configurationSource(corsConfigurationSource());
+                })
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(
                                 "/api/v1/auth/register",
@@ -73,6 +74,8 @@ public class SecurityConfig {
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "PUT", "PATCH", "POST", "DELETE"));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With")); // Request headers to allow
         corsConfiguration.setExposedHeaders(Arrays.asList("Some-Exposed-Header"));
+        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.addAllowedMethod("*");
         corsConfiguration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
