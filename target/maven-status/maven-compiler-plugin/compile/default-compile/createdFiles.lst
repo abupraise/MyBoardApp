@@ -9,11 +9,13 @@ com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/EmailNotSentException.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/RegisterRequest$RegisterRequestBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/UpdateUserRequest$UpdateUserRequestBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/service/impl/EmailServiceImpl.class
+com/SQD20/SQD20/LIVEPROJECT/infrastructure/config/CloudinaryConfig.class
 com/SQD20/SQD20/LIVEPROJECT/repository/TaskListRepository.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/GlobalExceptionHandler.class
 com/SQD20/SQD20/LIVEPROJECT/service/TaskListService.class
 com/SQD20/SQD20/LIVEPROJECT/domain/enums/Status.class
 com/SQD20/SQD20/LIVEPROJECT/payload/response/TaskListResponse.class
+com/SQD20/SQD20/LIVEPROJECT/service/impl/FileUploadServiceImpl.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/config/ThymeLeafConfig.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/config/SecurityConfig.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/UserNotFoundException.class
@@ -25,6 +27,7 @@ com/SQD20/SQD20/LIVEPROJECT/domain/entites/TaskList$TaskListBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/domain/entites/AppUser$AppUserBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/controller/TaskListController.class
 com/SQD20/SQD20/LIVEPROJECT/domain/enums/PriorityLevel.class
+com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/InvalidAccessException.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/TaskListRequest.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/exception/PasswordNotFoundException.class
 com/SQD20/SQD20/LIVEPROJECT/payload/response/RegisterResponse.class
@@ -55,6 +58,8 @@ com/SQD20/SQD20/LIVEPROJECT/payload/request/EmailDetails$EmailDetailsBuilder.cla
 com/SQD20/SQD20/LIVEPROJECT/payload/request/AuthenticationRequest$AuthenticationRequestBuilder.class
 com/SQD20/SQD20/LIVEPROJECT/infrastructure/controller/AuthController.class
 com/SQD20/SQD20/LIVEPROJECT/service/UserService.class
+com/SQD20/SQD20/LIVEPROJECT/service/FileUploadService.class
+com/SQD20/SQD20/LIVEPROJECT/utils/AppConstant.class
 com/SQD20/SQD20/LIVEPROJECT/service/impl/TaskServiceImpl.class
 com/SQD20/SQD20/LIVEPROJECT/Sqd20LiveProjectApplication.class
 com/SQD20/SQD20/LIVEPROJECT/payload/request/RegisterRequest.class
