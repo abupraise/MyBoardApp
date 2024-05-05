@@ -50,5 +50,11 @@ public class TaskListController {
     public ResponseEntity<List<TaskListResponse>> getAllTaskList(@PathVariable(value = "id") long userId){
         return new ResponseEntity<>(taskListService.getAllTaskList(userId),HttpStatus.OK);
     }
+    @DeleteMapping("delete-all-task-list/{userId}")
+    ResponseEntity<String> deleteAllTaskList(@PathVariable Long userId){
+        taskListService.deleteAllTaskList(userId);
+
+        return new ResponseEntity<>("TaskLists Deleted Successfully", HttpStatus.OK);
+    }
 
 }
