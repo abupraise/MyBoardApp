@@ -57,6 +57,8 @@ public class UserServiceImpl implements UserService {
 
     @Value("${baseUrl}")
     private String baseUrl;
+    @Value("${frontend-host}")
+    private String frontendHost;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -293,7 +295,8 @@ public class UserServiceImpl implements UserService {
                 // Check if the token is valid for resetting the password
                 if (jwtService.validateToken(token)) {
                     // If the token is valid, return appropriate message
-                    response.sendRedirect("https://www.google.com");
+                    String url = frontendHost + "/reset-password?email=" + user.getEmail();
+                    response.sendRedirect(url);
                     return "Email Verified for Password Reset";
                 } else {
                     // If the token is invalid, return appropriate message
