@@ -12,5 +12,6 @@ public interface TaskListService {
 
      TaskList deleteTask(long Id);
     List<TaskListResponse> getAllTaskList(Long userID);
+    void deleteAllTaskList(Long userId);
 
 }

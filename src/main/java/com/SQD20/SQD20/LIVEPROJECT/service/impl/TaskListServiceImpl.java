@@ -86,6 +86,17 @@ public class TaskListServiceImpl implements TaskListService {
         }
         return taskLists.stream().map((taskList) -> mapToResponse(taskList)).collect(Collectors.toList());
     }
+    @Override
+    public void deleteAllTaskList(Long userId) {
+        List<TaskList> taskLists = taskListRepository.findByUserId(userId);
+        List<Task> tasks = taskRepository.findByUserId(userId);
+        if (taskLists.isEmpty()) {
+            throw new TaskListNotFoundException("No task lists found for user with ID: " + userId);
+        }
+        taskRepository.deleteAll(tasks);
+        taskListRepository.deleteAll(taskLists);
+
+    }
 
     TaskListResponse mapToResponse(TaskList task){
         TaskListResponse response = TaskListResponse.builder()
